@@ -1,36 +1,131 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<p align="center">
+  <img src="app/icon.svg" width="96" height="96" alt="logicCV logo" />
+</p>
 
-## Getting Started
+<h1 align="center">logicCV</h1>
 
-First, run the development server:
+<p align="center">
+  Write an ATS-friendly CV by talking to an AI assistant.<br />
+  No templates, no drag and drop. Just a conversation.
+</p>
+
+<p align="center">
+  <a href="https://github.com/Saif-jaber/logicCV"><img src="https://img.shields.io/badge/Next.js%2016-000000?logo=nextdotjs&logoColor=white" alt="Next.js 16" /></a>
+  <a href="https://react.dev"><img src="https://img.shields.io/badge/React%2019-61DAFB?logo=react&logoColor=black" alt="React 19" /></a>
+  <a href="https://www.typescriptlang.org"><img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="TypeScript" /></a>
+  <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind%20CSS%20v4-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" /></a>
+  <a href="https://www.prisma.io"><img src="https://img.shields.io/badge/Prisma%207-2D3748?logo=prisma&logoColor=white" alt="Prisma 7" /></a>
+</p>
+
+---
+
+## Overview
+
+logicCV is a resume and CV builder for people who would rather talk than type. A guided chat turns a blank page into a structured, ATS-friendly resume in minutes, with a live preview that updates on every message.
+
+The AI assistant currently runs on a well-defined mock engine (`lib/mock-ai.ts`) that is ready to be swapped for a real model once the backend is connected.
+
+## Features
+
+- **Build by chat**: answer a few guided questions (name, role, contact, summary, experience, education, skills) and the assistant drafts the full resume.
+- **Plain-word editing**: keep chatting to refine anything, e.g. "make my summary more confident", "add a project", or "match this job description".
+- **Live preview**: a paper-like resume renders beside the chat and updates in real time.
+- **ATS optimization**: a live score and checklist flag anything an applicant tracking system might miss.
+- **Resume library**: every draft is stored and listed on your dashboard.
+- **Auth flow**: sign-in and sign-up dialogs with per-user dashboards (credential verification is wired for the backend next).
+- **Polished landing page**: subtle scroll animations, custom brand mark, and fully responsive layout.
+
+## Tech stack
+
+| Layer      | Technology |
+| ---------- | ---------- |
+| Framework  | Next.js 16 (App Router, Turbopack) |
+| UI         | React 19, TypeScript |
+| Styling    | Tailwind CSS v4, tw-animate-css |
+| Components | shadcn/ui on Base UI |
+| Auth       | Auth.js (next-auth v5) with Prisma adapter |
+| Database   | PostgreSQL via Prisma 7 + `@prisma/adapter-pg` |
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 20 or newer
+- PostgreSQL 15 or newer
+
+### Installation
 
 ```bash
+# 1. Clone the repository
+git clone https://github.com/Saif-jaber/logicCV.git
+cd logicCV
+
+# 2. Install dependencies
+npm install
+
+# 3. Configure environment variables (see below)
+cp .env.example .env
+
+# 4. Create the database schema
+npx prisma db push
+
+# 5. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). The app defaults to the landing page; use the auth dialogs to reach the dashboard.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Variable       | Required | Description                                                          |
+| -------------- | -------- | -------------------------------------------------------------------- |
+| `DATABASE_URL` | Yes      | PostgreSQL connection string (e.g. `postgresql://user:pass@host:5432/logiccv`) |
+| `AUTH_SECRET`  | Yes      | Secret used by Auth.js to sign sessions. Generate one with `openssl rand -base64 32`. |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command            | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `npm run dev`      | Start the Next.js dev server                 |
+| `npm run build`    | Create a production build                    |
+| `npm run start`    | Start the production server                  |
+| `npm run lint`     | Run ESLint across the project                |
+| `npx prisma db push` | Sync the schema to the database            |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+app/                 App Router pages and layouts
+  dashboard/         Dashboard, resumes list, resume builder
+  page.tsx           Landing page
+components/
+  landing/           Landing page sections and auth dialog
+  resume/            Resume builder and live preview
+  ui/                shadcn/ui primitives (button, dialog, input, ...)
+  sidebar.tsx        App sidebar (desktop rail + mobile drawer)
+lib/
+  mock-ai.ts         Mock AI conversation engine
+  resume.ts          Resume model and ATS scoring
+  prisma.ts          Prisma client (Postgres driver adapter)
+prisma/schema.prisma Database schema
+auth.ts              Auth.js configuration
+```
 
-## Deploy on Vercel
+## Status
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- The auth and sign-in dialogs are functional UI flows; credential verification against the `users` table and session callbacks are marked as next steps in `auth.ts`.
+- Resume generation uses the mock engine so the full product flow can be validated before a real AI provider is wired in.
+- PDF export is stubbed until the backend is connected.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Roadmap
+
+- [x] Landing page with animations and auth dialogs
+- [x] Chat-driven resume builder with live ATS preview
+- [ ] Real credential verification and per-user dashboards
+- [ ] Generate resumes with a real LLM provider
+- [ ] Persist resumes per user (Prisma models already in place)
+- [ ] PDF export
+
+## License
+
+This project is currently private. Reuse of the code or brand requires permission from the maintainer.
