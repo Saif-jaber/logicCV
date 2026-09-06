@@ -8,6 +8,7 @@ import {
   ChevronsRight,
   FileText,
   LayoutGrid,
+  Mail,
   Settings,
   Sparkles,
   X,
@@ -53,6 +54,11 @@ const navSections: NavSection[] = [
         href: "/dashboard/resumes",
         icon: FileText,
       },
+      {
+        label: "Letters",
+        href: "/dashboard/letters",
+        icon: Mail,
+      },
     ],
   },
 ];
@@ -86,9 +92,7 @@ function NavLink({
           ? "bg-muted text-foreground"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
         item.highlight &&
-          !active &&
-          "border border-primary/30 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary",
-        item.highlight && active && "border border-primary/30",
+          "border border-primary/40 bg-gradient-to-r from-primary to-blue-700 text-primary-foreground shadow-[0_0_16px_-4px] shadow-primary/60 hover:from-blue-600 hover:to-blue-800",
         collapsed && "justify-center px-0"
       )}
       title={collapsed ? item.label : undefined}

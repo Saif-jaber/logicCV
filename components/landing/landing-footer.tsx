@@ -5,6 +5,7 @@ const footerLinks = [
   { label: "Overview", href: "/dashboard" },
   { label: "Build with AI", href: "/dashboard/resumes/new" },
   { label: "My resumes", href: "/dashboard/resumes" },
+  { label: "My letters", href: "/dashboard/letters" },
 ];
 
 export function LandingFooter() {

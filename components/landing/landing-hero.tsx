@@ -107,7 +107,7 @@ export function LandingHero() {
           >
             <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold text-primary">
               <Sparkles className="size-3" />
-              AI resume builder, free while in beta
+              AI resume & cover letter builder, free while in beta
             </span>
           </div>
 
@@ -118,7 +118,8 @@ export function LandingHero() {
             )}
             style={{ animationDuration: "700ms", animationDelay: "120ms" }}
           >
-            Your next resume starts with a{" "}
+            Your next resume or cover letter
+            starts with a{" "}
             <span className="bg-gradient-to-r from-blue-600 via-blue-600 to-sky-500 bg-clip-text text-transparent">
               conversation
             </span>
@@ -131,9 +132,9 @@ export function LandingHero() {
             )}
             style={{ animationDuration: "700ms", animationDelay: "240ms" }}
           >
-            LogicCV is an AI assistant that builds an ATS-friendly CV while you
-            chat. Answer a few questions, then fine-tune everything with plain
-            words.
+            LogicCV is an AI assistant that builds an ATS-friendly CV, resume,
+            or cover letter while you chat. Answer a few questions, then
+            fine-tune everything with plain words.
           </p>
 
           <div
@@ -167,7 +168,7 @@ export function LandingHero() {
             style={{ animationDuration: "700ms", animationDelay: "480ms" }}
           >
             ATS checked <span className="text-foreground/30">&middot;</span>{" "}
-            live preview <span className="text-foreground/30">&middot;</span>{" "}
+            resumes &amp; cover letters <span className="text-foreground/30">&middot;</span>{" "}
             no templates to wrestle
           </p>
         </div>
@@ -186,7 +187,7 @@ export function LandingHero() {
               <span className="size-2.5 rounded-full bg-foreground/10" />
               <span className="size-2.5 rounded-full bg-foreground/10" />
               <span className="ml-3 hidden text-xs font-medium text-muted-foreground sm:block">
-                logiccv.app &middot; resume builder
+                logiccv.app &middot; resume &amp; cover letter builder
               </span>
             </div>
             <div className="grid gap-6 p-5 sm:p-8 md:grid-cols-5">

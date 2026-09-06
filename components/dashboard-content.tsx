@@ -5,8 +5,8 @@ import {
   ClipboardCheck,
   FileUser,
   LayoutTemplate,
+  Mail,
   Menu,
-  MoreVertical,
   Search,
   FileText,
   Sparkles,
@@ -17,8 +17,12 @@ import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { DocumentCard } from "@/components/document-card";
 import { DocumentPreview } from "@/components/document-preview";
+import { ResumePreview } from "@/components/resume/resume-preview";
+import { LetterPreview } from "@/components/letter/letter-preview";
 import { documents } from "@/lib/resume";
+import { LETTER_WIDTH, letters } from "@/lib/letter";
 import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -48,6 +52,12 @@ const featureCards: FeatureCard[] = [
     subtitle: "Optimized for hiring software",
     icon: ClipboardCheck,
     badgeClassName: "bg-violet-100 text-violet-600",
+  },
+  {
+    title: "Letters",
+    subtitle: "Cover & application letters",
+    icon: Mail,
+    badgeClassName: "bg-rose-100 text-rose-600",
   },
 ];
 
@@ -112,7 +122,7 @@ export function DashboardContent() {
         </div>
       </header>
 
-      <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+      <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
         {featureCards.map((feature) => (
           <Card
             key={feature.title}
@@ -171,31 +181,15 @@ export function DashboardContent() {
         {filtered.length > 0 ? (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
             {filtered.map((document) => (
-              <article
+              <DocumentCard
                 key={document.id}
-                className="group overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm"
+                name={document.name}
+                updatedAt={document.updatedAt}
               >
-                <div className="aspect-[3/4] w-full">
-                  <DocumentPreview tone={document.tone} />
-                </div>
-                <div className="flex items-center justify-between gap-2 px-2.5 py-2.5">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-foreground">
-                      {document.name}
-                    </p>
-                    <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                      {document.updatedAt}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    aria-label={`More options for ${document.name}`}
-                    className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <MoreVertical className="size-4" />
-                  </button>
-                </div>
-              </article>
+                <DocumentPreview>
+                  <ResumePreview resume={document.resume} />
+                </DocumentPreview>
+              </DocumentCard>
             ))}
           </div>
         ) : (
@@ -216,6 +210,40 @@ export function DashboardContent() {
             </Button>
           </div>
         )}
+      </section>
+
+      <section className="mt-8">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground">
+              My Letters
+            </h2>
+          </div>
+          <Link
+            href="/dashboard/letters"
+            className={cn(
+              buttonVariants({ variant: "outline" }),
+              "rounded-full"
+            )}
+          >
+            View All
+            <ChevronRight className="size-4" />
+          </Link>
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
+          {letters.slice(0, 4).map((document) => (
+            <DocumentCard
+              key={document.id}
+              name={document.name}
+              updatedAt={document.updatedAt}
+            >
+              <DocumentPreview pageWidth={LETTER_WIDTH}>
+                <LetterPreview letter={document.letter} />
+              </DocumentPreview>
+            </DocumentCard>
+          ))}
+        </div>
       </section>
     </main>
   );

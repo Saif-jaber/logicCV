@@ -27,7 +27,7 @@ const steps = [
   {
     number: "03",
     icon: ShieldCheck,
-    title: "Ship an ATS-friendly CV",
+    title: "Ship an ATS-friendly CV or letter",
     text: "Watch the score climb as sections fill in, then export your polished PDF.",
   },
 ];
@@ -36,7 +36,7 @@ const features = [
   {
     icon: Eye,
     title: "Live preview with every message",
-    text: "The resume renders beside your chat and updates the moment you type, so you always see the final result.",
+    text: "The document renders beside your chat and updates the moment you type — resumes and cover letters alike.",
   },
   {
     icon: ShieldCheck,
@@ -45,8 +45,8 @@ const features = [
   },
   {
     icon: FileDown,
-    title: "One-click PDF export",
-    text: "When you are happy with the wording, get a clean, print-ready file you can send anywhere.",
+    title: "Resumes, letters, one-click export",
+    text: "Build an ATS-ready CV or a tailored cover letter in one app, then get a clean print-ready PDF of either.",
   },
 ];
 
@@ -141,7 +141,7 @@ export function LandingSections() {
         <div className="mx-auto max-w-6xl">
           <SectionHeading
             eyebrow="How it works"
-            title="Three steps to a resume you actually like"
+            title="Three steps to a resume or letter you actually like"
             text="No forms, no drag and drop. You just talk."
           />
           <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -173,7 +173,7 @@ export function LandingSections() {
         <div className="mx-auto max-w-6xl">
           <SectionHeading
             eyebrow="Features"
-            title="Everything a resume needs, nothing it doesn't"
+            title="Everything an application needs, nothing it doesn't"
             text="Focused on the one thing that matters: getting you hired."
           />
           <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -243,11 +243,11 @@ export function LandingSections() {
                 className="pointer-events-none absolute -bottom-28 -left-16 size-72 rounded-full bg-white/10 blur-3xl"
               />
               <h2 className="relative mx-auto max-w-2xl text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                Ready to talk your way to a better resume?
+                Ready to talk your way to a better application?
               </h2>
               <p className="relative mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
-                Your first resume takes about five minutes. No account walls, no
-                credit card.
+                Your first resume or cover letter takes about five minutes. No
+                account walls, no credit card.
               </p>
               <AuthCta
                 mode="signup"

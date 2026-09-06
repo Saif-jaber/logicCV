@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   Check,
   Download,
   Minus,
@@ -9,21 +10,24 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { ResumePreview } from "@/components/resume/resume-preview";
+import { LetterPreview } from "@/components/letter/letter-preview";
 import { Paginated } from "@/components/paginated";
 import { ZoomablePage, PAGE_WIDTH } from "@/components/zoomable-page";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  beginConversation,
-  step,
-  type AiStage,
-  type PendingAction,
-} from "@/lib/mock-ai";
-import { computeAts, uid, type Resume } from "@/lib/resume";
+  beginLetterConversation,
+  stepLetter,
+  type LetterStage,
+  type LetterPending,
+} from "@/lib/mock-letter-ai";
+import { computeLetterScore, type Letter } from "@/lib/letter";
 import { downloadPdf } from "@/lib/pdf";
-import { ResumePdf } from "@/components/pdf/resume-pdf";
+import { LetterPdf } from "@/components/pdf/letter-pdf";
+import { uid } from "@/lib/resume";
 import { cn } from "@/lib/utils";
 
 type ChatMessage = {
@@ -34,26 +38,26 @@ type ChatMessage = {
 
 type BuilderState = {
   messages: ChatMessage[];
-  resume: Resume;
+  letter: Letter;
   stepIndex: number;
-  stage: AiStage;
-  pending: PendingAction | null;
+  stage: LetterStage;
+  pending: LetterPending | null;
   suggestions: string[];
 };
 
 function createInitialState(): BuilderState {
-  const { result, stepIndex } = beginConversation();
+  const { result, stepIndex } = beginLetterConversation();
   return {
     messages: [{ id: uid(), role: "ai", text: result.message }],
-    resume: result.resume,
+    letter: result.letter,
     stepIndex,
     stage: result.stage,
     pending: result.pending,
-    suggestions: result.suggestions,
+    suggestions: ["A cover letter", "An application letter"],
   };
 }
 
-export function ResumeBuilder() {
+export function LetterBuilder() {
   const [state, setState] = useState<BuilderState>(createInitialState);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -62,7 +66,7 @@ export function ResumeBuilder() {
   const [zoom, setZoom] = useState(1);
   const userAdjusted = useRef(false);
 
-  const ats = computeAts(state.resume);
+  const quality = computeLetterScore(state.letter);
 
   useLayoutEffect(() => {
     const container = previewScrollRef.current;
@@ -101,9 +105,9 @@ export function ResumeBuilder() {
 
     window.setTimeout(() => {
       setState((prev) => {
-        const { result, stepIndex } = step({
+        const { result, stepIndex } = stepLetter({
           input: text,
-          resume: prev.resume,
+          letter: prev.letter,
           stage: prev.stage,
           stepIndex: prev.stepIndex,
           pending: prev.pending,
@@ -114,7 +118,7 @@ export function ResumeBuilder() {
             ...prev.messages,
             { id: uid(), role: "ai" as const, text: result.message },
           ],
-          resume: result.resume,
+          letter: result.letter,
           stepIndex,
           stage: result.stage,
           pending: result.pending,
@@ -126,14 +130,55 @@ export function ResumeBuilder() {
   }
 
   async function handleExport() {
-    await downloadPdf(<ResumePdf resume={state.resume} />, "resume.pdf");
+    const name =
+      state.letter.kind === "application"
+        ? "application-letter.pdf"
+        : "cover-letter.pdf";
+    await downloadPdf(<LetterPdf letter={state.letter} />, name);
   }
 
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:h-[calc(100dvh-4rem)]">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-bold tracking-tight text-foreground uppercase">
+              Letter Builder
+            </h1>
+            <Badge
+              className={cn(
+                "rounded-full px-2.5 py-0.5 text-[11px] font-semibold",
+                quality.score >= 80
+                  ? "bg-emerald-100 text-emerald-700"
+                  : quality.score >= 50
+                    ? "bg-amber-100 text-amber-700"
+                    : "bg-gray-100 text-gray-600"
+              )}
+            >
+              Quality {quality.score}
+            </Badge>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Talk to the AI assistant. It writes a persuasive cover letter as you go.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/letters"
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "rounded-full text-muted-foreground"
+            )}
+          >
+            <ArrowLeft className="size-4" />
+            My Letters
+          </Link>
+        </div>
+      </header>
+
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:h-[calc(100dvh-9rem)]">
         <section
-          aria-label="Chat with the resume assistant"
+          aria-label="Chat with the letter assistant"
           className="flex h-[50dvh] min-h-[320px] sm:h-[60dvh] sm:min-h-[400px] flex-col overflow-hidden rounded-2xl border border-border bg-card lg:h-full"
         >
           <div className="flex items-center gap-2.5 border-b border-border px-4 py-3">
@@ -196,7 +241,7 @@ export function ResumeBuilder() {
           </div>
 
           <div className="border-t border-border p-3">
-            {state.stage === "chat" && (
+            {state.suggestions.length > 0 && (
               <div className="mb-3 flex flex-wrap gap-2">
                 {state.suggestions.map((suggestion) => (
                   <button
@@ -238,16 +283,18 @@ export function ResumeBuilder() {
           </div>
         </section>
 
-        <section
-          aria-label="Live resume preview"
+<section
+          aria-label="Live letter preview"
           className="flex h-[50dvh] min-h-[320px] sm:h-[60dvh] sm:min-h-[400px] min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-card lg:h-auto"
         >
           <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2.5">
             <div className="flex items-center gap-2">
               <span className="text-sm font-bold text-foreground">
-                {ats.score}
+                {quality.score}
               </span>
-              <span className="text-[11px] text-muted-foreground">/100 ATS</span>
+              <span className="text-[11px] text-muted-foreground">
+                /100 quality
+              </span>
               <button
                 type="button"
                 onClick={handleExport}
@@ -293,17 +340,17 @@ export function ResumeBuilder() {
           >
             <ZoomablePage zoom={zoom}>
               <Paginated>
-                <ResumePreview resume={state.resume} />
+                <LetterPreview letter={state.letter} />
               </Paginated>
             </ZoomablePage>
           </div>
 
           <div className="border-t border-border px-4 py-3">
             <p className="text-xs font-semibold text-foreground">
-              ATS checklist
+              Quality checklist
             </p>
             <ul className="mt-2 grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-              {ats.checks.map((check) => (
+              {quality.checks.map((check) => (
                 <li
                   key={check.label}
                   className={cn(

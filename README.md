@@ -5,7 +5,7 @@
 <h1 align="center">logicCV</h1>
 
 <p align="center">
-  Write an ATS-friendly CV by talking to an AI assistant.<br />
+  Write ATS-friendly CVs and cover letters by talking to an AI assistant.<br />
   No templates, no drag and drop. Just a conversation.
 </p>
 
@@ -21,17 +21,19 @@
 
 ## Overview
 
-logicCV is a resume and CV builder for people who would rather talk than type. A guided chat turns a blank page into a structured, ATS-friendly resume in minutes, with a live preview that updates on every message.
+logicCV is a resume, CV, and cover letter builder for people who would rather talk than type. A guided chat turns a blank page into a structured, ATS-friendly document in minutes — resumes, cover letters, and application letters alike — with a live preview that updates on every message.
 
 The AI assistant currently runs on a well-defined mock engine (`lib/mock-ai.ts`) that is ready to be swapped for a real model once the backend is connected.
 
 ## Features
 
 - **Build by chat**: answer a few guided questions (name, role, contact, summary, experience, education, skills) and the assistant drafts the full resume.
-- **Plain-word editing**: keep chatting to refine anything, e.g. "make my summary more confident", "add a project", or "match this job description".
-- **Live preview**: a paper-like resume renders beside the chat and updates in real time.
+- **Cover & application letters**: chat a letter into being — the assistant draws on the profile it already knows and handles the greeting, body, and sign-off.
+- **Plain-word editing**: keep chatting to refine anything, e.g. "make my summary more confident", "add a project", "match this job description", or "regenerate the intro to my letter".
+- **Live preview**: a paper-like resume or letter renders beside the chat and updates in real time.
 - **ATS optimization**: a live score and checklist flag anything an applicant tracking system might miss.
-- **Resume library**: every draft is stored and listed on your dashboard.
+- **One-click PDF export**: resumes and letters download as clean, print-ready PDFs with real selectable text (ATS-friendly, no screenshots).
+- **Document library**: every draft is stored and listed on your dashboard.
 - **Auth flow**: sign-in and sign-up dialogs with per-user dashboards (credential verification is wired for the backend next).
 - **Polished landing page**: subtle scroll animations, custom brand mark, and fully responsive layout.
 
@@ -101,11 +103,15 @@ app/                 App Router pages and layouts
 components/
   landing/           Landing page sections and auth dialog
   resume/            Resume builder and live preview
+  letter/            Cover / application letter builder and live preview
+  pdf/               react-pdf documents for resume and letter export
   ui/                shadcn/ui primitives (button, dialog, input, ...)
   sidebar.tsx        App sidebar (desktop rail + mobile drawer)
 lib/
   mock-ai.ts         Mock AI conversation engine
   resume.ts          Resume model and ATS scoring
+  letter.ts          Letter model and scoring
+  pdf.ts             Client-side PDF download helper
   prisma.ts          Prisma client (Postgres driver adapter)
 prisma/schema.prisma Database schema
 auth.ts              Auth.js configuration
@@ -115,16 +121,17 @@ auth.ts              Auth.js configuration
 
 - The auth and sign-in dialogs are functional UI flows; credential verification against the `users` table and session callbacks are marked as next steps in `auth.ts`.
 - Resume generation uses the mock engine so the full product flow can be validated before a real AI provider is wired in.
-- PDF export is stubbed until the backend is connected.
+- PDF export runs fully client-side with vector text (via `@react-pdf/renderer`), so documents are parseable by ATS software without any backend.
 
 ## Roadmap
 
 - [x] Landing page with animations and auth dialogs
 - [x] Chat-driven resume builder with live ATS preview
+- [x] Chat-driven cover and application letter builder with live preview
+- [x] One-click ATS-friendly PDF export
 - [ ] Real credential verification and per-user dashboards
-- [ ] Generate resumes with a real LLM provider
-- [ ] Persist resumes per user (Prisma models already in place)
-- [ ] PDF export
+- [ ] Generate resumes and letters with a real LLM provider
+- [ ] Persist documents per user (Prisma models already in place)
 
 ## License
 
