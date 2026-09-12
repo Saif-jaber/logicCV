@@ -9,12 +9,12 @@ import {
   Menu,
   Search,
   FileText,
-  Sparkles,
   X,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { BuildAiDialog } from "@/components/build-ai-dialog";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DocumentCard } from "@/components/document-card";
@@ -66,9 +66,10 @@ export function DashboardContent() {
   const [search, setSearch] = useState("");
 
   const normalized = search.trim().toLowerCase();
-  const filtered = documents.filter(
-    (doc) => normalized === "" || doc.name.toLowerCase().includes(normalized)
-  );
+  const matches = (name: string) =>
+    normalized === "" || name.toLowerCase().includes(normalized);
+  const filteredDocuments = documents.filter((doc) => matches(doc.name));
+  const filteredLetters = letters.filter((letter) => matches(letter.name));
 
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
@@ -94,8 +95,8 @@ export function DashboardContent() {
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search resumes..."
-              aria-label="Search resumes"
+              placeholder="Search files..."
+              aria-label="Search all files"
               className="h-6 w-32 rounded-none border-none p-0 shadow-none focus-visible:ring-0 sm:w-48 lg:w-56"
             />
             {search !== "" && (
@@ -109,16 +110,7 @@ export function DashboardContent() {
               </button>
             )}
           </div>
-          <Link
-            href="/dashboard/resumes/new"
-            className={cn(
-              buttonVariants({ variant: "default" }),
-              "rounded-full px-4 py-2 md:hidden"
-            )}
-          >
-            <Sparkles className="size-4" />
-            Build with AI
-          </Link>
+          <BuildAiDialog className="py-2 md:hidden" />
         </div>
       </header>
 
@@ -178,9 +170,9 @@ export function DashboardContent() {
           </Link>
         </div>
 
-        {filtered.length > 0 ? (
+        {filteredDocuments.length > 0 ? (
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
-            {filtered.map((document) => (
+            {filteredDocuments.map((document) => (
               <DocumentCard
                 key={document.id}
                 name={document.name}
@@ -196,7 +188,7 @@ export function DashboardContent() {
           <div className="mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
             <FileText className="size-8 text-muted-foreground" />
             <p className="text-sm font-medium text-foreground">
-              No resumes found
+              {normalized === "" ? "No resumes found" : "No resumes match your search"}
             </p>
             <p className="text-sm text-muted-foreground">
               Try a different search term.
@@ -231,19 +223,40 @@ export function DashboardContent() {
           </Link>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
-          {letters.slice(0, 4).map((document) => (
-            <DocumentCard
-              key={document.id}
-              name={document.name}
-              updatedAt={document.updatedAt}
+        {filteredLetters.length > 0 ? (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
+            {filteredLetters
+              .slice(0, normalized === "" ? 4 : filteredLetters.length)
+              .map((document) => (
+                <DocumentCard
+                  key={document.id}
+                  name={document.name}
+                  updatedAt={document.updatedAt}
+                >
+                  <DocumentPreview pageWidth={LETTER_WIDTH}>
+                    <LetterPreview letter={document.letter} />
+                  </DocumentPreview>
+                </DocumentCard>
+              ))}
+          </div>
+        ) : (
+          <div className="mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
+            <Mail className="size-8 text-muted-foreground" />
+            <p className="text-sm font-medium text-foreground">
+              No letters match your search
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Try a different search term.
+            </p>
+            <Button
+              variant="outline"
+              className="rounded-full"
+              onClick={() => setSearch("")}
             >
-              <DocumentPreview pageWidth={LETTER_WIDTH}>
-                <LetterPreview letter={document.letter} />
-              </DocumentPreview>
-            </DocumentCard>
-          ))}
-        </div>
+              Clear search
+            </Button>
+          </div>
+        )}
       </section>
     </main>
   );

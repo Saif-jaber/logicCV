@@ -2,10 +2,9 @@ import Link from "next/link";
 import { BrandMark } from "./brand-mark";
 
 const footerLinks = [
-  { label: "Overview", href: "/dashboard" },
-  { label: "Build with AI", href: "/dashboard/resumes/new" },
-  { label: "My resumes", href: "/dashboard/resumes" },
-  { label: "My letters", href: "/dashboard/letters" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Features", href: "#features" },
+  { label: "Wall of love", href: "#wall-of-love" },
 ];
 
 export function LandingFooter() {

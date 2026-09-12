@@ -7,18 +7,18 @@ datasource db {
 }
 
 model User {
-  id                 String              @id @default(cuid())
+  id                 String  @id @default(cuid())
   name               String?
-  email              String?             @unique
+  email              String? @unique
+  password           String?
   emailVerified      DateTime?
   image              String?
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
   accounts           Account[]
   sessions           Session[]
-  applicationLetters ApplicationLetter[]
   resumes            Resume[]
-  coverLetters       CoverLetter[]
+  letters            Letter[]
 
   @@map("users")
 }
@@ -63,23 +63,10 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-model ApplicationLetter {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("application_letters")
-}
-
 model Resume {
   id        String   @id @default(cuid())
-  title     String
-  data      Json?
+  name      String
+  data      Json     @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
@@ -89,15 +76,21 @@ model Resume {
   @@map("resumes")
 }
 
-model CoverLetter {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum LetterKind {
+  cover
+  application
+}
+
+model Letter {
+  id        String     @id @default(cuid())
+  name      String
+  kind      LetterKind
+  data      Json       @default("{}")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@map("cover_letters")
+  @@map("letters")
 }

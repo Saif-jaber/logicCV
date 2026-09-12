@@ -15,8 +15,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { BuildAiDialog } from "@/components/build-ai-dialog";
 import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
 
@@ -33,6 +33,24 @@ export type NavSection = {
   label: string;
   items: NavItem[];
 };
+
+export type SidebarUser = {
+  name?: string | null;
+  email?: string | null;
+};
+
+function getInitials(user?: SidebarUser): string {
+  const name = user?.name?.trim();
+  if (name) {
+    const parts = name.split(/\s+/).slice(0, 2);
+    return parts.map((p) => p[0]?.toUpperCase() ?? "").join("") || "?";
+  }
+  return user?.email?.[0]?.toUpperCase() ?? "?";
+}
+
+function getDisplayName(user?: SidebarUser): string {
+  return user?.name?.trim() || user?.email || "Guest";
+}
 
 const navSections: NavSection[] = [
   {
@@ -82,19 +100,46 @@ function NavLink({
     </>
   );
 
+  const classes = cn(
+    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+    active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+    item.highlight &&
+      "border border-primary/40 bg-gradient-to-r from-primary to-blue-700 text-primary-foreground shadow-[0_0_16px_-4px] shadow-primary/60 hover:from-blue-600 hover:to-blue-800",
+    collapsed && "justify-center px-0"
+  );
+
+  if (item.label === "Build with AI") {
+    return (
+      <BuildAiDialog
+        trigger={(open) => (
+          <button
+            type="button"
+            onClick={open}
+            aria-current={active ? "page" : undefined}
+            className={classes}
+            title={collapsed ? item.label : undefined}
+          >
+            {collapsed ? (
+              <span
+                className="relative flex items-center justify-center"
+                data-tooltip={item.label}
+              >
+                {content}
+              </span>
+            ) : (
+              content
+            )}
+          </button>
+        )}
+      />
+    );
+  }
+
   return (
     <Link
       href={item.href}
       aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-        active
-          ? "bg-muted text-foreground"
-          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-        item.highlight &&
-          "border border-primary/40 bg-gradient-to-r from-primary to-blue-700 text-primary-foreground shadow-[0_0_16px_-4px] shadow-primary/60 hover:from-blue-600 hover:to-blue-800",
-        collapsed && "justify-center px-0"
-      )}
+      className={classes}
       title={collapsed ? item.label : undefined}
     >
       {collapsed ? (
@@ -114,9 +159,11 @@ function NavLink({
 function SidebarContent({
   collapsed,
   topRight,
+  user,
 }: {
   collapsed: boolean;
   topRight?: ReactNode;
+  user?: SidebarUser;
 }) {
   const { toggleCollapsed } = useSidebar();
 
@@ -192,33 +239,21 @@ function SidebarContent({
         >
           <Avatar className="size-8 shrink-0">
             <AvatarFallback className="bg-blue-100 text-xs font-semibold text-blue-600">
-              JK
+              {getInitials(user)}
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
             <span className="truncate text-sm font-medium text-foreground">
-              Joel Koyoo
+              {getDisplayName(user)}
             </span>
           )}
         </div>
-        <Button
-          variant="outline"
-          className={cn(
-            "mt-3 w-full rounded-full border-primary text-primary hover:bg-primary/5 hover:text-primary",
-            collapsed && "size-9 rounded-full px-0"
-          )}
-          title={collapsed ? "Upgrade to Pro" : undefined}
-          aria-label={collapsed ? "Upgrade to Pro" : undefined}
-        >
-          <Sparkles className="size-4 shrink-0 text-primary" />
-          {!collapsed && "Upgrade to Pro"}
-        </Button>
       </div>
     </div>
   );
 }
 
-function DesktopSidebar() {
+function DesktopSidebar({ user }: { user?: SidebarUser }) {
   const { collapsed } = useSidebar();
 
   return (
@@ -228,12 +263,12 @@ function DesktopSidebar() {
         collapsed ? "w-16 px-2.5" : "w-60 px-5"
       )}
     >
-      <SidebarContent collapsed={collapsed} />
+      <SidebarContent collapsed={collapsed} user={user} />
     </aside>
   );
 }
 
-function MobileSidebar() {
+function MobileSidebar({ user }: { user?: SidebarUser }) {
   const { mobileOpen, closeMobile } = useSidebar();
 
   useEffect(() => {
@@ -285,17 +320,18 @@ function MobileSidebar() {
               <X className="size-4" />
             </button>
           }
+          user={user}
         />
       </aside>
     </div>
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ user }: { user?: SidebarUser }) {
   return (
     <>
-      <DesktopSidebar />
-      <MobileSidebar />
+      <DesktopSidebar user={user} />
+      <MobileSidebar user={user} />
     </>
   );
 }

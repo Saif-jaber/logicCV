@@ -1,17 +1,26 @@
 import Link from "next/link";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus } from "lucide-react";
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { DocumentCard } from "@/components/document-card";
 import { DocumentPreview } from "@/components/document-preview";
 import { ResumePreview } from "@/components/resume/resume-preview";
+import { BuildAiDialog } from "@/components/build-ai-dialog";
 import { buttonVariants } from "@/components/ui/button";
-import { documents } from "@/lib/resume";
+import { fetchUserResumes } from "@/lib/documents";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
   title: "My Resumes",
 };
 
-export default function ResumesPage() {
+export default async function ResumesPage() {
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) redirect("/sign-in");
+
+  const documents = await fetchUserResumes(userId);
+
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
@@ -24,13 +33,7 @@ export default function ResumesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/dashboard/resumes/new"
-            className={cn(buttonVariants({ variant: "default" }), "rounded-full px-4")}
-          >
-            <Sparkles className="size-4" />
-            Build with AI
-          </Link>
+          <BuildAiDialog />
         </div>
       </header>
 
@@ -40,6 +43,7 @@ export default function ResumesPage() {
             key={document.id}
             name={document.name}
             updatedAt={document.updatedAt}
+            href={`/dashboard/resumes/${document.id}`}
           >
             <DocumentPreview>
               <ResumePreview resume={document.resume} />
