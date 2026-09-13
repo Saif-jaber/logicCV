@@ -23,9 +23,10 @@ import {
   stepLetter,
   type LetterStage,
   type LetterPending,
-} from "@/lib/mock-letter-ai";
+} from "@/lib/letter-ai";
 import { computeLetterScore, type Letter } from "@/lib/letter";
 import { downloadPdf } from "@/lib/pdf";
+import { saveLetterAction } from "@/app/actions/documents";
 import { LetterPdf } from "@/components/pdf/letter-pdf";
 import { uid } from "@/lib/resume";
 import { cn } from "@/lib/utils";
@@ -45,11 +46,11 @@ type BuilderState = {
   suggestions: string[];
 };
 
-function createInitialState(): BuilderState {
+function createInitialState(initialLetter: Letter): BuilderState {
   const { result, stepIndex } = beginLetterConversation();
   return {
     messages: [{ id: uid(), role: "ai", text: result.message }],
-    letter: result.letter,
+    letter: initialLetter,
     stepIndex,
     stage: result.stage,
     pending: result.pending,
@@ -57,8 +58,23 @@ function createInitialState(): BuilderState {
   };
 }
 
-export function LetterBuilder() {
-  const [state, setState] = useState<BuilderState>(createInitialState);
+export function LetterBuilder({
+  docId,
+  initialName,
+  initialLetter,
+}: {
+  docId: string;
+  initialName: string;
+  initialLetter: Letter;
+}) {
+  const [state, setState] = useState<BuilderState>(() =>
+    createInitialState(initialLetter)
+  );
+  const [name, setName] = useState(initialName);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
+    "saved"
+  );
+  const firstRender = useRef(true);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -88,6 +104,24 @@ export function LetterBuilder() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [state.messages, typing]);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    setSaveStatus("saving");
+    const timer = window.setTimeout(() => {
+      saveLetterAction(
+        docId,
+        name.trim() === "" ? "Untitled Letter" : name,
+        state.letter
+      )
+        .then(() => setSaveStatus("saved"))
+        .catch(() => setSaveStatus("error"));
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [docId, name, state.letter]);
 
   function send(raw?: string) {
     const text = (raw ?? input).trim();
@@ -162,7 +196,28 @@ export function LetterBuilder() {
             Talk to the AI assistant. It writes a persuasive cover letter as you go.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Untitled Letter"
+            aria-label="Letter name"
+            className="h-8 w-40 rounded-full border-border bg-muted/40 px-3 text-sm sm:w-52"
+          />
+          <span
+            className={cn(
+              "text-xs",
+              saveStatus === "error"
+                ? "text-red-500"
+                : "text-muted-foreground"
+            )}
+          >
+            {saveStatus === "saving"
+              ? "Saving..."
+              : saveStatus === "error"
+                ? "Failed to save"
+                : "Saved"}
+          </span>
           <Link
             href="/dashboard/letters"
             className={cn(
@@ -190,7 +245,7 @@ export function LetterBuilder() {
                 LogicCV Assistant
               </p>
               <p className="text-xs text-muted-foreground">
-                Mock AI &middot; free-form chat
+                AI assistant &middot; free-form chat
               </p>
             </div>
           </div>

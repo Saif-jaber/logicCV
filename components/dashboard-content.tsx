@@ -13,6 +13,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { BuildAiDialog } from "@/components/build-ai-dialog";
 import { Card } from "@/components/ui/card";
@@ -21,8 +22,14 @@ import { DocumentCard } from "@/components/document-card";
 import { DocumentPreview } from "@/components/document-preview";
 import { ResumePreview } from "@/components/resume/resume-preview";
 import { LetterPreview } from "@/components/letter/letter-preview";
-import { documents } from "@/lib/resume";
-import { LETTER_WIDTH, letters } from "@/lib/letter";
+import { LETTER_WIDTH } from "@/lib/letter";
+import type { StoredLetter, StoredResume } from "@/lib/documents";
+import {
+  deleteLetterAction,
+  deleteResumeAction,
+  renameLetterAction,
+  renameResumeAction,
+} from "@/app/actions/documents";
 import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -61,14 +68,46 @@ const featureCards: FeatureCard[] = [
   },
 ];
 
-export function DashboardContent() {
+export function DashboardContent({
+  resumes,
+  letters,
+}: {
+  resumes: StoredResume[];
+  letters: StoredLetter[];
+}) {
   const { openMobile } = useSidebar();
+  const router = useRouter();
   const [search, setSearch] = useState("");
+
+  const renameDocument = async (
+    id: string,
+    newName: string,
+    kind: "resume" | "letter"
+  ) => {
+    if (kind === "resume") {
+      await renameResumeAction(id, newName);
+    } else {
+      await renameLetterAction(id, newName);
+    }
+    router.refresh();
+  };
+
+  const deleteDocument = async (
+    id: string,
+    kind: "resume" | "letter"
+  ) => {
+    if (kind === "resume") {
+      await deleteResumeAction(id);
+    } else {
+      await deleteLetterAction(id);
+    }
+    router.refresh();
+  };
 
   const normalized = search.trim().toLowerCase();
   const matches = (name: string) =>
     normalized === "" || name.toLowerCase().includes(normalized);
-  const filteredDocuments = documents.filter((doc) => matches(doc.name));
+  const filteredDocuments = resumes.filter((doc) => matches(doc.name));
   const filteredLetters = letters.filter((letter) => matches(letter.name));
 
   return (
@@ -177,6 +216,10 @@ export function DashboardContent() {
                 key={document.id}
                 name={document.name}
                 updatedAt={document.updatedAt}
+                href={`/dashboard/resumes/${document.id}`}
+                noun="resume"
+                onRename={(newName) => renameDocument(document.id, newName, "resume")}
+                onDelete={() => deleteDocument(document.id, "resume")}
               >
                 <DocumentPreview>
                   <ResumePreview resume={document.resume} />
@@ -191,7 +234,9 @@ export function DashboardContent() {
               {normalized === "" ? "No resumes found" : "No resumes match your search"}
             </p>
             <p className="text-sm text-muted-foreground">
-              Try a different search term.
+              {normalized === ""
+                ? "Start a new resume with the AI builder."
+                : "Try a different search term."}
             </p>
             <Button
               variant="outline"
@@ -232,6 +277,10 @@ export function DashboardContent() {
                   key={document.id}
                   name={document.name}
                   updatedAt={document.updatedAt}
+                  href={`/dashboard/letters/${document.id}`}
+                  noun="letter"
+                  onRename={(newName) => renameDocument(document.id, newName, "letter")}
+                  onDelete={() => deleteDocument(document.id, "letter")}
                 >
                   <DocumentPreview pageWidth={LETTER_WIDTH}>
                     <LetterPreview letter={document.letter} />
@@ -243,10 +292,12 @@ export function DashboardContent() {
           <div className="mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
             <Mail className="size-8 text-muted-foreground" />
             <p className="text-sm font-medium text-foreground">
-              No letters match your search
+              {normalized === "" ? "No letters found" : "No letters match your search"}
             </p>
             <p className="text-sm text-muted-foreground">
-              Try a different search term.
+              {normalized === ""
+                ? "Start a new letter with the AI builder."
+                : "Try a different search term."}
             </p>
             <Button
               variant="outline"

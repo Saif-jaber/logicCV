@@ -6,11 +6,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  user
+  admin
+}
+
 model User {
   id                 String  @id @default(cuid())
   name               String?
   email              String? @unique
   password           String?
+  role               Role    @default(user)
   emailVerified      DateTime?
   image              String?
   createdAt          DateTime @default(now())
@@ -19,6 +25,7 @@ model User {
   sessions           Session[]
   resumes            Resume[]
   letters            Letter[]
+  apiKeys            ApiKey[]
 
   @@map("users")
 }
@@ -93,4 +100,34 @@ model Letter {
 
   @@index([userId])
   @@map("letters")
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  keyHash    String    @unique
+  keyPrefix  String
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  revokedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model UserDeletion {
+  id              String   @id @default(cuid())
+  userId          String
+  email           String
+  reason          String
+  deletedByUserId String
+  deletedByEmail  String
+  deletedAt       DateTime @default(now())
+
+  @@index([deletedAt])
+  @@map("user_deletions")
 }

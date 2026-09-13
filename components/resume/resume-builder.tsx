@@ -9,20 +9,22 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ResumePreview } from "@/components/resume/resume-preview";
 import { Paginated } from "@/components/paginated";
 import { ZoomablePage, PAGE_WIDTH } from "@/components/zoomable-page";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   beginConversation,
   step,
   type AiStage,
   type PendingAction,
-} from "@/lib/mock-ai";
+} from "@/lib/resume-ai";
 import { computeAts, uid, type Resume } from "@/lib/resume";
 import { downloadPdf } from "@/lib/pdf";
+import { saveResumeAction } from "@/app/actions/documents";
 import { ResumePdf } from "@/components/pdf/resume-pdf";
 import { cn } from "@/lib/utils";
 
@@ -41,11 +43,14 @@ type BuilderState = {
   suggestions: string[];
 };
 
-function createInitialState(): BuilderState {
+function createInitialState(
+  initialName: string,
+  initialResume: Resume
+): BuilderState {
   const { result, stepIndex } = beginConversation();
   return {
     messages: [{ id: uid(), role: "ai", text: result.message }],
-    resume: result.resume,
+    resume: initialResume,
     stepIndex,
     stage: result.stage,
     pending: result.pending,
@@ -53,8 +58,23 @@ function createInitialState(): BuilderState {
   };
 }
 
-export function ResumeBuilder() {
-  const [state, setState] = useState<BuilderState>(createInitialState);
+export function ResumeBuilder({
+  docId,
+  initialName,
+  initialResume,
+}: {
+  docId: string;
+  initialName: string;
+  initialResume: Resume;
+}) {
+  const [state, setState] = useState<BuilderState>(() =>
+    createInitialState(initialName, initialResume)
+  );
+  const [name, setName] = useState(initialName);
+  const [saveStatus, setSaveStatus] = useState<"saved" | "saving" | "error">(
+    "saved"
+  );
+  const firstRender = useRef(true);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
@@ -84,6 +104,24 @@ export function ResumeBuilder() {
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [state.messages, typing]);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+    setSaveStatus("saving");
+    const timer = window.setTimeout(() => {
+      saveResumeAction(
+        docId,
+        name.trim() === "" ? "Untitled Resume" : name,
+        state.resume
+      )
+        .then(() => setSaveStatus("saved"))
+        .catch(() => setSaveStatus("error"));
+    }, 600);
+    return () => window.clearTimeout(timer);
+  }, [docId, name, state.resume]);
 
   function send(raw?: string) {
     const text = (raw ?? input).trim();
@@ -131,7 +169,39 @@ export function ResumeBuilder() {
 
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:h-[calc(100dvh-4rem)]">
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <Input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Untitled Resume"
+            aria-label="Resume name"
+            className="h-9 w-56 rounded-full border-border bg-card px-4"
+          />
+          <span
+            className={cn(
+              "text-xs",
+              saveStatus === "error"
+                ? "text-red-500"
+                : "text-muted-foreground"
+            )}
+          >
+            {saveStatus === "saving"
+              ? "Saving..."
+              : saveStatus === "error"
+                ? "Failed to save"
+                : "Saved"}
+          </span>
+        </div>
+        <Link
+          href="/dashboard/resumes"
+          className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "rounded-full text-muted-foreground")}
+        >
+          My Resumes
+        </Link>
+      </header>
+
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:h-[calc(100dvh-8rem)]">
         <section
           aria-label="Chat with the resume assistant"
           className="flex h-[50dvh] min-h-[320px] sm:h-[60dvh] sm:min-h-[400px] flex-col overflow-hidden rounded-2xl border border-border bg-card lg:h-full"
@@ -145,7 +215,7 @@ export function ResumeBuilder() {
                 LogicCV Assistant
               </p>
               <p className="text-xs text-muted-foreground">
-                Mock AI &middot; free-form chat
+                AI assistant &middot; free-form chat
               </p>
             </div>
           </div>

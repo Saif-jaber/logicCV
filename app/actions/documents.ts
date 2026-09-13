@@ -41,6 +41,28 @@ export async function saveLetterAction(
   });
 }
 
+export async function renameResumeAction(
+  docId: string,
+  name: string
+): Promise<void> {
+  const userId = await requireUserId();
+  await prisma.resume.updateMany({
+    where: { id: docId, userId },
+    data: { name },
+  });
+}
+
+export async function renameLetterAction(
+  docId: string,
+  name: string
+): Promise<void> {
+  const userId = await requireUserId();
+  await prisma.letter.updateMany({
+    where: { id: docId, userId },
+    data: { name },
+  });
+}
+
 export async function deleteResumeAction(docId: string): Promise<void> {
   const userId = await requireUserId();
   await prisma.resume.deleteMany({ where: { id: docId, userId } });

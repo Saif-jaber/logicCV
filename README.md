@@ -23,7 +23,7 @@
 
 logicCV is a resume, CV, and cover letter builder for people who would rather talk than type. A guided chat turns a blank page into a structured, ATS-friendly document in minutes — resumes, cover letters, and application letters alike — with a live preview that updates on every message.
 
-The AI assistant currently runs on a well-defined mock engine (`lib/mock-ai.ts`) that is ready to be swapped for a real model once the backend is connected.
+The AI assistant currently runs on well-defined rule-based engines (`lib/resume-ai.ts` and `lib/letter-ai.ts`) that are ready to be swapped for a real model; every conversation now persists to Postgres through server actions.
 
 ## Features
 
@@ -33,8 +33,8 @@ The AI assistant currently runs on a well-defined mock engine (`lib/mock-ai.ts`)
 - **Live preview**: a paper-like resume or letter renders beside the chat and updates in real time.
 - **ATS optimization**: a live score and checklist flag anything an applicant tracking system might miss.
 - **One-click PDF export**: resumes and letters download as clean, print-ready PDFs with real selectable text (ATS-friendly, no screenshots).
-- **Document library**: every draft is stored and listed on your dashboard.
-- **Auth flow**: sign-in and sign-up dialogs with per-user dashboards (credential verification is wired for the backend next).
+- **Document library**: every draft is stored per user in Postgres and listed on your dashboard, with inline rename and delete (with a deletion reason) right from the card menu.
+- **Auth flow**: sign-in and sign-up against the `users` table (bcrypt + JWT), per-user dashboards, and route protection for the dashboard.
 - **Polished landing page**: subtle scroll animations, custom brand mark, and fully responsive layout.
 
 ## Tech stack
@@ -108,7 +108,9 @@ components/
   ui/                shadcn/ui primitives (button, dialog, input, ...)
   sidebar.tsx        App sidebar (desktop rail + mobile drawer)
 lib/
-  mock-ai.ts         Mock AI conversation engine
+  resume-ai.ts      Rule-based resume conversation engine
+  letter-ai.ts      Rule-based letter conversation engine
+  documents.ts      Server fetchers for user resumes and letters
   resume.ts          Resume model and ATS scoring
   letter.ts          Letter model and scoring
   pdf.ts             Client-side PDF download helper
@@ -119,8 +121,9 @@ auth.ts              Auth.js configuration
 
 ## Status
 
-- The auth and sign-in dialogs are functional UI flows; credential verification against the `users` table and session callbacks are marked as next steps in `auth.ts`.
-- Resume generation uses the mock engine so the full product flow can be validated before a real AI provider is wired in.
+- Auth uses Auth.js v5 with the Credentials provider; sign-up and sign-in verify against the `users` table and issue JWT sessions, with real per-user document storage in Postgres.
+- Roles: users have a `role` column (`user` / `admin`) so admins can be distinguished from regular users.
+- Resumes and letters are persisted per user in Postgres, listed on the dashboard, and support inline rename and delete (with a deletion reason) from each document card.
 - PDF export runs fully client-side with vector text (via `@react-pdf/renderer`), so documents are parseable by ATS software without any backend.
 
 ## Roadmap
@@ -129,9 +132,10 @@ auth.ts              Auth.js configuration
 - [x] Chat-driven resume builder with live ATS preview
 - [x] Chat-driven cover and application letter builder with live preview
 - [x] One-click ATS-friendly PDF export
-- [ ] Real credential verification and per-user dashboards
+- [x] Real credential verification and per-user dashboards
+- [x] Persist documents per user (Prisma models + rename/delete with reason)
+- [x] Users `role` column (`user` / `admin`) with admin area scaffold
 - [ ] Generate resumes and letters with a real LLM provider
-- [ ] Persist documents per user (Prisma models already in place)
 
 ## License
 

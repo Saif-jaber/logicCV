@@ -8,6 +8,10 @@ import { ResumePreview } from "@/components/resume/resume-preview";
 import { BuildAiDialog } from "@/components/build-ai-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import { fetchUserResumes } from "@/lib/documents";
+import {
+  deleteResumeAction,
+  renameResumeAction,
+} from "@/app/actions/documents";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
@@ -44,6 +48,9 @@ export default async function ResumesPage() {
             name={document.name}
             updatedAt={document.updatedAt}
             href={`/dashboard/resumes/${document.id}`}
+            noun="resume"
+            onRename={renameResumeAction.bind(null, document.id)}
+            onDelete={deleteResumeAction.bind(null, document.id)}
           >
             <DocumentPreview>
               <ResumePreview resume={document.resume} />

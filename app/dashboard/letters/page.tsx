@@ -9,6 +9,10 @@ import { BuildAiDialog } from "@/components/build-ai-dialog";
 import { buttonVariants } from "@/components/ui/button";
 import { LETTER_WIDTH } from "@/lib/letter";
 import { fetchUserLetters } from "@/lib/documents";
+import {
+  deleteLetterAction,
+  renameLetterAction,
+} from "@/app/actions/documents";
 import { cn } from "@/lib/utils";
 
 export const metadata = {
@@ -46,6 +50,9 @@ export default async function LettersPage() {
             name={document.name}
             updatedAt={document.updatedAt}
             href={`/dashboard/letters/${document.id}`}
+            noun="letter"
+            onRename={renameLetterAction.bind(null, document.id)}
+            onDelete={deleteLetterAction.bind(null, document.id)}
           >
             <DocumentPreview pageWidth={LETTER_WIDTH}>
               <LetterPreview letter={document.letter} />
