@@ -107,9 +107,9 @@ export function AuthForm({
           name="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder={isSignup ? "At least 6 characters" : "Your password"}
+          placeholder={isSignup ? "8+ chars, upper, lowercase & number" : "Your password"}
           autoComplete={isSignup ? "new-password" : "current-password"}
-          minLength={isSignup ? 6 : 1}
+          minLength={isSignup ? 8 : 1}
           className="h-10 pr-10 pl-9"
           aria-invalid={!!errors.password}
         />

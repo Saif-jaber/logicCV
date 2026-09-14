@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
-import { signIn, signOut } from "@/auth";
+import { signIn, signOut, auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
 
@@ -11,6 +11,23 @@ export type AuthFormState = {
 } | undefined;
 
 const EMAIL_RE = /^\S+@\S+\.\S+$/;
+const PASSWORD_MIN = 8;
+
+function passwordIssue(password: string): string | null {
+  if (password.length < PASSWORD_MIN) {
+    return `Use at least ${PASSWORD_MIN} characters.`;
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Add at least one uppercase letter.";
+  }
+  if (!/[a-z]/.test(password)) {
+    return "Add at least one lowercase letter.";
+  }
+  if (!/\d/.test(password)) {
+    return "Add at least one number.";
+  }
+  return null;
+}
 
 export async function signUpAction(
   _prevState: AuthFormState,
@@ -27,8 +44,11 @@ export async function signUpAction(
   if (!EMAIL_RE.test(email)) {
     errors.email = "Please enter a valid email address.";
   }
-  if (password.length < 6) {
-    errors.password = "Use at least 6 characters.";
+  const pwIssue = passwordIssue(password);
+  if (password.length > 128) {
+    errors.password = "Use at most 128 characters.";
+  } else if (pwIssue) {
+    errors.password = pwIssue;
   }
   if (Object.keys(errors).length > 0) {
     return { errors };
@@ -85,7 +105,8 @@ export async function signInAction(
     return { errors: { form: "Something went wrong. Please try again." } };
   }
 
-  redirect("/dashboard");
+  const session = await auth();
+  redirect(session?.user?.role === "admin" ? "/admin" : "/dashboard");
 }
 
 export async function signOutAction(): Promise<void> {
