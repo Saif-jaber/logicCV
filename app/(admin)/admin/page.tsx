@@ -15,109 +15,19 @@ import {
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "Admin Overview",
 };
 
-const demoSignups: SignupPoint[] = [
-  { label: "Sep 1", count: 12 },
-  { label: "Sep 2", count: 19 },
-  { label: "Sep 3", count: 15 },
-  { label: "Sep 4", count: 24 },
-  { label: "Sep 5", count: 9 },
-  { label: "Sep 6", count: 21 },
-  { label: "Sep 7", count: 33 },
-  { label: "Sep 8", count: 18 },
-  { label: "Sep 9", count: 27 },
-  { label: "Sep 10", count: 14 },
-  { label: "Sep 11", count: 22 },
-  { label: "Sep 12", count: 31 },
-  { label: "Sep 13", count: 26 },
-  { label: "Sep 14", count: 17 },
-];
+const DAY_WINDOW = 14;
 
-const demoRecentUsers: {
-  id: string;
-  name: string | null;
-  email: string | null;
-  role: "user" | "admin";
-  joinedAt: string;
-}[] = [
-  {
-    id: "u1",
-    name: "Sarah Kim",
-    email: "sarah@example.com",
-    role: "user",
-    joinedAt: "2026-09-14T09:41:00Z",
-  },
-  {
-    id: "u2",
-    name: "Miguel Alvarez",
-    email: "miguel@example.com",
-    role: "user",
-    joinedAt: "2026-09-14T08:12:00Z",
-  },
-  {
-    id: "u3",
-    name: "Daniel Chen",
-    email: "daniel@example.com",
-    role: "user",
-    joinedAt: "2026-09-13T22:03:00Z",
-  },
-  {
-    id: "u4",
-    name: "Amara Osei",
-    email: "amara@example.com",
-    role: "user",
-    joinedAt: "2026-09-13T18:47:00Z",
-  },
-  {
-    id: "u5",
-    name: "Leo Fischer",
-    email: "leo@example.com",
-    role: "admin",
-    joinedAt: "2026-09-13T11:29:00Z",
-  },
-];
-
-const demoRecentDeletions: {
-  id: string;
-  email: string;
-  reason: string;
-  deletedByEmail: string;
-  deletedAt: string;
-}[] = [
-  {
-    id: "d1",
-    email: "old.account@example.com",
-    reason: "No longer needs the service",
-    deletedByEmail: "old.account@example.com",
-    deletedAt: "2026-09-13T16:20:00Z",
-  },
-  {
-    id: "d2",
-    email: "spam.user@example.com",
-    reason: "Policy violation",
-    deletedByEmail: "admin@logiccv.app",
-    deletedAt: "2026-09-12T10:05:00Z",
-  },
-  {
-    id: "d3",
-    email: "test.temp@example.com",
-    reason: "Duplicate account",
-    deletedByEmail: "test.temp@example.com",
-    deletedAt: "2026-09-10T14:38:00Z",
-  },
-];
-
-const demoStats = {
-  users: 284,
-  admins: 3,
-  deletions: 12,
-};
-
-const totalSignups = demoSignups.reduce((sum, d) => sum + d.count, 0);
+function getDayStart(date: Date): Date {
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
 
 function getInitials(name: string | null, email: string | null): string {
   const value = name?.trim();
@@ -134,7 +44,118 @@ function formatDate(iso: string): string {
   );
 }
 
-export default function AdminOverviewPage() {
+function dayLabel(date: Date): string {
+  return date.toLocaleString("en-US", { month: "short", day: "numeric" });
+}
+
+export default async function AdminOverviewPage() {
+  const today = new Date();
+  const signupsWindowStart = getDayStart(today);
+  signupsWindowStart.setDate(signupsWindowStart.getDate() - (DAY_WINDOW - 1));
+
+  const weekStart = getDayStart(today);
+  weekStart.setDate(weekStart.getDate() - 7);
+  const previousWeekStart = getDayStart(weekStart);
+  previousWeekStart.setDate(previousWeekStart.getDate() - 7);
+
+  const deletionsWindowStart = getDayStart(today);
+  deletionsWindowStart.setDate(deletionsWindowStart.getDate() - DAY_WINDOW);
+  const deletionsPreviousWindowStart = getDayStart(deletionsWindowStart);
+  deletionsPreviousWindowStart.setDate(
+    deletionsPreviousWindowStart.getDate() - DAY_WINDOW
+  );
+
+  const [
+    totalUsers,
+    totalAdmins,
+    signupsWeek,
+    signupsPreviousWeek,
+    recentSignupRows,
+    recentDeletionRows,
+    countByDay,
+    deletionsWindow,
+    deletionsPreviousWindow,
+    totalDeletions,
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.user.count({ where: { role: "admin" } }),
+    prisma.user.count({ where: { createdAt: { gte: weekStart } } }),
+    prisma.user.count({
+      where: { createdAt: { gte: previousWeekStart, lt: weekStart } },
+    }),
+    prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 5,
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
+    }),
+    prisma.userDeletion.findMany({
+      orderBy: { deletedAt: "desc" },
+      take: 3,
+      select: {
+        id: true,
+        email: true,
+        reason: true,
+        deletedByEmail: true,
+        deletedAt: true,
+      },
+    }),
+    prisma.user
+      .findMany({
+        where: { createdAt: { gte: signupsWindowStart } },
+        select: { createdAt: true },
+      })
+      .then((rows) => {
+        const counts = new Map<string, number>();
+        for (const row of rows) {
+          const key = row.createdAt.toDateString();
+          counts.set(key, (counts.get(key) ?? 0) + 1);
+        }
+        return counts;
+      }),
+    prisma.userDeletion.count({
+      where: { deletedAt: { gte: deletionsWindowStart } },
+    }),
+    prisma.userDeletion.count({
+      where: {
+        deletedAt: {
+          gte: deletionsPreviousWindowStart,
+          lt: deletionsWindowStart,
+        },
+      },
+    }),
+    prisma.userDeletion.count(),
+  ]);
+
+  const signupPoints: SignupPoint[] = [];
+  for (let i = DAY_WINDOW - 1; i >= 0; i--) {
+    const day = getDayStart(today);
+    day.setDate(day.getDate() - i);
+    signupPoints.push({
+      label: dayLabel(day),
+      count: countByDay.get(day.toDateString()) ?? 0,
+    });
+  }
+
+  const totalSignups = signupPoints.reduce((sum, point) => sum + point.count, 0);
+  const signupsDiff = signupsWeek - signupsPreviousWeek;
+  const deletionsDiff = deletionsWindow - deletionsPreviousWindow;
+
+  const recentUsers = recentSignupRows.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    joinedAt: user.createdAt.toISOString(),
+  }));
+
+  const recentDeletions = recentDeletionRows.map((deletion) => ({
+    id: deletion.id,
+    email: deletion.email,
+    reason: deletion.reason,
+    deletedByEmail: deletion.deletedByEmail,
+    deletedAt: deletion.deletedAt.toISOString(),
+  }));
+
   return (
     <>
       <AdminHeader title="Overview" description="Platform health at a glance.">
@@ -150,23 +171,29 @@ export default function AdminOverviewPage() {
       <section className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         <StatCard
           label="Total users"
-          value={demoStats.users}
+          value={totalUsers}
           icon={UsersRound}
           iconClassName="bg-blue-100 text-blue-600 dark:bg-blue-500/15 dark:text-blue-300"
-          trend={{ direction: "up", label: "+12 this week" }}
+          trend={{
+            direction: signupsDiff >= 0 ? "up" : "down",
+            label: `${signupsDiff >= 0 ? "+" : ""}${signupsDiff} this week`,
+          }}
         />
         <StatCard
           label="Admins"
-          value={demoStats.admins}
+          value={totalAdmins}
           icon={ShieldCheck}
           iconClassName="bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-300"
         />
         <StatCard
           label="Deletions (14 days)"
-          value={demoStats.deletions}
+          value={deletionsWindow}
           icon={ScrollText}
           iconClassName="bg-rose-100 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300"
-          trend={{ direction: "down", label: "-3 vs last period" }}
+          trend={{
+            direction: deletionsDiff <= 0 ? "down" : "up",
+            label: `${deletionsDiff >= 0 ? "+" : ""}${deletionsDiff} vs previous period`,
+          }}
         />
       </section>
 
@@ -179,7 +206,7 @@ export default function AdminOverviewPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <SignupsChart data={demoSignups} total={String(totalSignups)} />
+            <SignupsChart data={signupPoints} total={String(totalSignups)} />
           </CardContent>
         </Card>
 
@@ -195,7 +222,7 @@ export default function AdminOverviewPage() {
                 Total users
               </span>
               <span className="font-semibold text-foreground">
-                {demoStats.users}
+                {totalUsers}
               </span>
             </div>
             <div className="flex items-center justify-between gap-3">
@@ -204,7 +231,7 @@ export default function AdminOverviewPage() {
                 Administrators
               </span>
               <span className="font-semibold text-foreground">
-                {demoStats.admins}
+                {totalAdmins}
               </span>
             </div>
             <div className="flex items-center justify-between gap-3">
@@ -213,7 +240,7 @@ export default function AdminOverviewPage() {
                 Accounts deleted
               </span>
               <span className="font-semibold text-foreground">
-                {demoStats.deletions}
+                {totalDeletions}
               </span>
             </div>
           </CardContent>
@@ -234,7 +261,7 @@ export default function AdminOverviewPage() {
             </CardAction>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            {demoRecentUsers.map((user) => (
+            {recentUsers.map((user) => (
               <div
                 key={user.id}
                 className="flex items-center gap-3 border-b border-border pb-4 last:border-b-0 last:pb-0"
@@ -276,7 +303,7 @@ export default function AdminOverviewPage() {
             </CardAction>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            {demoRecentDeletions.map((deletion) => (
+            {recentDeletions.map((deletion) => (
               <div
                 key={deletion.id}
                 className="flex items-center gap-3 border-b border-border pb-4 last:border-b-0 last:pb-0"

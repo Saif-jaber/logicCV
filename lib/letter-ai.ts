@@ -75,7 +75,7 @@ function composeClosing(letter: Letter, tone: Tone): string {
   return tone === "warm"
     ? `I'd love to chat about how I could help ${org} grow. I'm flexible and happy to work around your schedule.`
     : tone === "confident"
-      ? `I look forward to speaking with you — and I'm ready to make an impact at ${org} from day one.`
+      ? `I look forward to speaking with you, and I'm ready to make an impact at ${org} from day one.`
       : `I would welcome the chance to discuss how I can contribute to ${org}. Thank you for your consideration.`;
 }
 
@@ -208,7 +208,7 @@ function handleCoverOnboarding(
       letter.role = role.role;
       letter.company = role.company;
       return letterOnboardingResult(
-        `Great — a ${letter.role}${role.company ? ` at ${role.company}` : ""}. Who should it be addressed to? A hiring manager's name, or just say "Hiring Manager".`,
+        `Great, a ${letter.role}${role.company ? ` at ${role.company}` : ""}. Who should it be addressed to? A hiring manager's name, or just say "Hiring Manager".`,
         letter,
         3
       );
@@ -224,7 +224,7 @@ function handleCoverOnboarding(
     case 4: {
       letter.achievements = splitLines(input);
       return letterOnboardingResult(
-        `Those will land. Last question: how should the letter sound — professional, warm, or confident?`,
+        `Those will land. Last question: how should the letter sound: professional, warm, or confident?`,
         letter,
         5
       );
@@ -267,7 +267,7 @@ function handleApplicationOnboarding(
     case 2: {
       letter.company = input.trim();
       return letterOnboardingResult(
-        `Good choice. What draws you to ${letter.company}? Give a short reason — their mission, culture, or an initiative you admire.`,
+        `Good choice. What draws you to ${letter.company}? Give a short reason, such as their mission, culture, or an initiative you admire.`,
         letter,
         3
       );
@@ -291,7 +291,7 @@ function handleApplicationOnboarding(
     case 5: {
       letter.achievements = splitLines(input);
       return letterOnboardingResult(
-        `Those will land. Last question: how should the letter sound — professional, warm, or confident?`,
+        `Those will land. Last question: how should the letter sound: professional, warm, or confident?`,
         letter,
         6
       );
@@ -343,7 +343,7 @@ function handleChat(
     letter.achievements = [...letter.achievements, input.trim()].filter(Boolean);
     letter.body = composeBody(letter, toneFromLetter(letter));
     return letterChatResult(
-      "Wove that highlight into the letter. Take a look at the preview — anything else?",
+      "Wove that highlight into the letter. Take a look at the preview. Anything else?",
       letter,
       null
     );
@@ -400,7 +400,7 @@ function handleChat(
       .map((c) => c.label.toLowerCase());
     return letterChatResult(
       missing.length === 0
-        ? `Quality check: ${quality.score}/100. Every section is covered — this letter is ready to send.`
+        ? `Quality check: ${quality.score}/100. Every section is covered, so this letter is ready to send.`
         : `Quality check: ${quality.score}/100. Missing: ${missing.join(
             ", "
           )}. Tell me which one to fix and I'll handle it.`,

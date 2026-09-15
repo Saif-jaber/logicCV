@@ -6,7 +6,6 @@ import { useEffect, type ReactNode } from "react";
 import {
   ChevronsLeft,
   ChevronsRight,
-  ExternalLink,
   LayoutDashboard,
   ScrollText,
   ShieldCheck,
@@ -166,22 +165,6 @@ function AdminSidebarContent({
 
       <div className="mt-auto flex flex-col pt-6">
         <Separator />
-        <nav className="mt-4 flex flex-col gap-1" aria-label="Admin links">
-          <Link
-            href="/dashboard"
-            aria-label={collapsed ? "Back to the app" : undefined}
-            title={collapsed ? "Back to the app" : undefined}
-            className={cn(
-              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground",
-              collapsed && "justify-center px-0"
-            )}
-          >
-            <ExternalLink className="size-[18px] shrink-0" />
-            <span className={cn("truncate", collapsed && "hidden")}>
-              Back to the app
-            </span>
-          </Link>
-        </nav>
         <div
           className={cn(
             "mt-4 flex items-center gap-2 rounded-lg border border-border p-2",

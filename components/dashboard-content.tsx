@@ -149,7 +149,7 @@ export function DashboardContent({
               </button>
             )}
           </div>
-          <BuildAiDialog className="py-2 md:hidden" />
+          <BuildAiDialog className="py-2" />
         </div>
       </header>
 
@@ -238,13 +238,17 @@ export function DashboardContent({
                 ? "Start a new resume with the AI builder."
                 : "Try a different search term."}
             </p>
-            <Button
-              variant="outline"
-              className="rounded-full"
-              onClick={() => setSearch("")}
-            >
-              Clear search
-            </Button>
+            {normalized === "" ? (
+              <BuildAiDialog className="rounded-full" />
+            ) : (
+              <Button
+                variant="outline"
+                className="rounded-full"
+                onClick={() => setSearch("")}
+              >
+                Clear search
+              </Button>
+            )}
           </div>
         )}
       </section>

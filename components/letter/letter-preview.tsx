@@ -49,8 +49,8 @@ export function LetterPreview({ letter }: { letter: Letter }) {
             <p className="text-xs leading-relaxed text-gray-300">
               <Placeholder>
                 {letter.kind === "application"
-                  ? "Your opening — the company you're applying to and why."
-                  : "Your opening paragraph — why you're interested in the role."}
+                  ? "Your opening: the company you're applying to and why."
+                  : "Your opening paragraph: why you're interested in the role."}
               </Placeholder>
             </p>
             <p className="text-xs leading-relaxed text-gray-300">

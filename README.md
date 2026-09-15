@@ -21,20 +21,21 @@
 
 ## Overview
 
-logicCV is a resume, CV, and cover letter builder for people who would rather talk than type. A guided chat turns a blank page into a structured, ATS-friendly document in minutes — resumes, cover letters, and application letters alike — with a live preview that updates on every message.
+logicCV is a resume, CV, and cover letter builder for people who would rather talk than type. A guided chat turns a blank page into a structured, ATS-friendly document in minutes. Resumes, cover letters, and application letters alike render beside the chat in a live preview that updates on every message.
 
 The AI assistant currently runs on well-defined rule-based engines (`lib/resume-ai.ts` and `lib/letter-ai.ts`) that are ready to be swapped for a real model; every conversation now persists to Postgres through server actions.
 
 ## Features
 
 - **Build by chat**: answer a few guided questions (name, role, contact, summary, experience, education, skills) and the assistant drafts the full resume.
-- **Cover & application letters**: chat a letter into being — the assistant draws on the profile it already knows and handles the greeting, body, and sign-off.
+- **Cover & application letters**: chat a letter into being. The assistant draws on the profile it already knows and handles the greeting, body, and sign-off.
 - **Plain-word editing**: keep chatting to refine anything, e.g. "make my summary more confident", "add a project", "match this job description", or "regenerate the intro to my letter".
 - **Live preview**: a paper-like resume or letter renders beside the chat and updates in real time.
 - **ATS optimization**: a live score and checklist flag anything an applicant tracking system might miss.
 - **One-click PDF export**: resumes and letters download as clean, print-ready PDFs with real selectable text (ATS-friendly, no screenshots).
 - **Document library**: every draft is stored per user in Postgres and listed on your dashboard, with inline rename and delete (with a deletion reason) right from the card menu.
-- **Auth flow**: sign-in and sign-up against the `users` table (bcrypt + JWT), per-user dashboards, and route protection for the dashboard.
+- **Role-based access**: sign-in and sign-up against the `users` table (bcrypt + JWT) with per-user dashboards and route protection. Admins land in the admin area; regular users get a 404 when they try to open `/admin`, and admins are never shown the normal user dashboard.
+- **Admin dashboard**: live platform stats, a 14-day signup chart, recent signups, and the latest deletions, all read straight from Postgres.
 - **Polished landing page**: subtle scroll animations, custom brand mark, and fully responsive layout.
 
 ## Tech stack
@@ -99,6 +100,7 @@ Open [http://localhost:3000](http://localhost:3000). The app defaults to the lan
 ```
 app/                 App Router pages and layouts
   dashboard/         Dashboard, resumes list, resume builder
+  (admin)/admin/     Admin area (overview, users, deletion log)
   page.tsx           Landing page
 components/
   landing/           Landing page sections and auth dialog
@@ -117,12 +119,14 @@ lib/
   prisma.ts          Prisma client (Postgres driver adapter)
 prisma/schema.prisma Database schema
 auth.ts              Auth.js configuration
+proxy.ts             Route-level auth and role protection
 ```
 
 ## Status
 
 - Auth uses Auth.js v5 with the Credentials provider; sign-up and sign-in verify against the `users` table and issue JWT sessions, with real per-user document storage in Postgres.
-- Roles: users have a `role` column (`user` / `admin`) so admins can be distinguished from regular users.
+- Roles: users have a `role` column (`user` / `admin`). `/admin` and its pages are locked to admins (regular users get a 404), and admins are redirected away from the user dashboard to the admin area.
+- The admin overview reads live data from the database: total users and admins, deletions over the last 14 days, a daily signup chart, the latest signups, and the most recent deletions.
 - Resumes and letters are persisted per user in Postgres, listed on the dashboard, and support inline rename and delete (with a deletion reason) from each document card.
 - PDF export runs fully client-side with vector text (via `@react-pdf/renderer`), so documents are parseable by ATS software without any backend.
 
@@ -134,7 +138,7 @@ auth.ts              Auth.js configuration
 - [x] One-click ATS-friendly PDF export
 - [x] Real credential verification and per-user dashboards
 - [x] Persist documents per user (Prisma models + rename/delete with reason)
-- [x] Users `role` column (`user` / `admin`) with admin area scaffold
+- [x] Users `role` column (`user` / `admin`) with admin area and role-based route protection
 - [ ] Generate resumes and letters with a real LLM provider
 
 ## License

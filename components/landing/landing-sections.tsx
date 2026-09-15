@@ -36,7 +36,7 @@ const features = [
   {
     icon: Eye,
     title: "Live preview with every message",
-    text: "The document renders beside your chat and updates the moment you type — resumes and cover letters alike.",
+    text: "The document renders beside your chat and updates the moment you type, with resumes and cover letters alike.",
   },
   {
     icon: ShieldCheck,

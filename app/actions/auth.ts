@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { AuthError } from "next-auth";
-import { signIn, signOut, auth } from "@/auth";
+import { signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/password";
 
@@ -85,7 +85,7 @@ export async function signUpAction(
     return { errors: { form: "Something went wrong. Please try again." } };
   }
 
-  redirect("/dashboard/resumes/new");
+  redirect("/dashboard");
 }
 
 export async function signInAction(
@@ -105,8 +105,11 @@ export async function signInAction(
     return { errors: { form: "Something went wrong. Please try again." } };
   }
 
-  const session = await auth();
-  redirect(session?.user?.role === "admin" ? "/admin" : "/dashboard");
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: { role: true },
+  });
+  redirect(user?.role === "admin" ? "/admin" : "/dashboard");
 }
 
 export async function signOutAction(): Promise<void> {
