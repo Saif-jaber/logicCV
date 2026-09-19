@@ -41,7 +41,7 @@ export function SaveExitDialog({
         onClick={() => setOpen(true)}
         className={cn(
           buttonVariants({ variant: "ghost", size: "sm" }),
-          "rounded-full text-muted-foreground"
+          "db-section-link"
         )}
       >
         <ArrowLeft className="size-4" />

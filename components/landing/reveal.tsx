@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { useInView } from "./use-in-view";
 
@@ -8,15 +8,17 @@ export function Reveal({
   children,
   className,
   delay = 0,
+  as: Tag = "div",
 }: {
   children: ReactNode;
   className?: string;
   delay?: number;
+  as?: ElementType;
 }) {
-  const { ref, inView } = useInView<HTMLDivElement>();
+  const { ref, inView } = useInView<HTMLElement>();
 
   return (
-    <div
+    <Tag
       ref={ref}
       className={cn(
         inView
@@ -31,6 +33,6 @@ export function Reveal({
       }
     >
       {children}
-    </div>
+    </Tag>
   );
 }

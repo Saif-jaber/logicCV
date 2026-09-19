@@ -1,32 +1,28 @@
-import {
-  ArrowRight,
-  Eye,
-  FileDown,
-  MessageSquareText,
-  MessagesSquare,
-  ShieldCheck,
-} from "lucide-react";
+import { Download } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { AnimatedNumber } from "./animated-number";
 import { Reveal } from "./reveal";
 import { AuthCta } from "./auth-cta";
 
+const stats = [
+  { value: 92, suffix: "/100", label: "average ATS score after one chat session" },
+  { value: 5, suffix: " min", label: "from a blank page to a first draft" },
+  { value: 100, suffix: "%", label: "chat-driven. no forms, no templates to fill" },
+];
+
 const steps = [
   {
-    number: "01",
-    icon: MessagesSquare,
+    num: "01",
     title: "Answer quick questions",
     text: "Tell the assistant your name, role, and experience. No blank templates, no formatting.",
   },
   {
-    number: "02",
-    icon: MessageSquareText,
+    num: "02",
     title: "Talk in plain words",
-    text: "Refine anything naturally: 'make my summary more confident' or 'add my latest project'.",
+    text: "Refine anything naturally: \u201Cmake my summary more confident\u201D or \u201Cadd my latest project\u201D.",
   },
   {
-    number: "03",
-    icon: ShieldCheck,
+    num: "03",
     title: "Ship an ATS-friendly CV or letter",
     text: "Watch the score climb as sections fill in, then export your polished PDF.",
   },
@@ -34,26 +30,23 @@ const steps = [
 
 const features = [
   {
-    icon: Eye,
-    title: "Live preview with every message",
-    text: "The document renders beside your chat and updates the moment you type, with resumes and cover letters alike.",
+    kicker: "Live preview",
+    title: "The document keeps up as you type",
+    text: "The rendered resume sits beside your chat and updates with every message. Resumes and cover letters alike. You see the result take shape, not fields to fill.",
+    proof: <LivePreviewProof />,
   },
   {
-    icon: ShieldCheck,
-    title: "Built for ATS parsers",
-    text: "Clean structure, standard section names, and a checklist that flags anything a system might miss.",
+    kicker: "Built for ATS parsers",
+    title: "A score you can watch climb",
+    text: "Clean structure, standard section names, and a checklist that flags anything a system might miss. See 54 become 90 as you chat.",
+    proof: <AtsProof />,
   },
   {
-    icon: FileDown,
-    title: "Resumes, letters, one-click export",
-    text: "Build an ATS-ready CV or a tailored cover letter in one app, then get a clean print-ready PDF of either.",
+    kicker: "One-click export",
+    title: "Resumes and letters, ready to send",
+    text: "Build an ATS-ready CV or a tailored cover letter in one app, then get a clean print-ready PDF of either the moment you stop typing.",
+    proof: <ExportProof />,
   },
-];
-
-const stats = [
-  { value: 92, suffix: "/100", label: "average ATS score after one chat session" },
-  { value: 5, suffix: " min", label: "from a blank page to a first draft" },
-  { value: 100, suffix: "%", label: "chat-driven. No forms, no templates to fill" },
 ];
 
 const quotes = [
@@ -77,91 +70,136 @@ const quotes = [
   },
 ];
 
-function SectionHeading({
-  eyebrow,
-  title,
-  text,
-}: {
-  eyebrow: string;
-  title: string;
-  text: string;
-}) {
+function LivePreviewProof() {
   return (
-    <div className="mx-auto max-w-2xl text-center">
-      <Reveal>
-        <p className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-          {eyebrow}
+    <div className="lp-proof">
+      <div className="lp-proof__head">
+        <span className="lp-proof__title">Live preview</span>
+        <span className="font-code text-xs text-ink-2">0:12 → draft</span>
+      </div>
+      <div className="lp-proof__body lp-live">
+        <p className="lp-doc-line">
+          <span className="lp-doc-line__num">01</span>
+          <span className="truncate">Joel Koyoo</span>
         </p>
-      </Reveal>
-      <Reveal delay={80}>
-        <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-          {title}
-        </h2>
-      </Reveal>
-      <Reveal delay={160}>
-        <p className="mt-4 text-lg text-muted-foreground">{text}</p>
-      </Reveal>
+        <p className="lp-doc-line">
+          <span className="lp-doc-line__num">02</span>
+          <span className="truncate text-ink-2">Frontend Developer · Nairobi</span>
+        </p>
+        <p className="lp-doc-line">
+          <span className="lp-doc-line__num">03</span>
+          <span>
+            <span className="lp-doc-line__bar block w-[92%]" />
+          </span>
+        </p>
+        <p className="lp-doc-line">
+          <span className="lp-doc-line__num">04</span>
+          <span>
+            <span className="lp-doc-line__bar block w-[64%]" />
+          </span>
+        </p>
+        <p className="lp-doc-line">
+          <span className="lp-doc-line__num">05</span>
+          <span>
+            <span className="lp-doc-line__bar block w-[78%]" />
+          </span>
+        </p>
+      </div>
     </div>
   );
 }
 
-const cardHover =
-  "transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-blue-950/5";
+function AtsProof() {
+  const checks = [
+    "Parsed name & contact",
+    "Standard section headers",
+    "Role verbs, no wasted words",
+  ];
+  return (
+    <div className="lp-proof">
+      <div className="lp-proof__head">
+        <span className="lp-proof__title">ATS check</span>
+        <span className="font-code text-xs text-ink-2">
+          54 → <span className="text-cobalt">90</span>
+        </span>
+      </div>
+      <div className="lp-proof__body">
+        <div className="lp-score__row">
+          <span>compat score</span>
+          <span className="text-cobalt">+36</span>
+        </div>
+        <div className="lp-score__track">
+          <div className="lp-score__fill" style={{ width: "90%" }} />
+        </div>
+        <div className="mt-4 border-t border-rule">
+          {checks.map((c) => (
+            <div key={c} className="lp-check">
+              <span>{c}</span>
+              <span className="lp-check__tick" aria-hidden>
+                ✓
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ExportProof() {
+  return (
+    <div className="lp-proof">
+      <div className="lp-proof__head">
+        <span className="lp-proof__title">Export</span>
+        <Download className="size-4 text-cobalt" aria-hidden />
+      </div>
+      <div className="mt-2">
+        <div className="lp-file">
+          <span className="lp-file__name">resume-joel-koyoo.pdf</span>
+          <span className="lp-file__status">PDF ready</span>
+        </div>
+        <div className="lp-file">
+          <span className="lp-file__name">cover-letter-joel-koyoo.pdf</span>
+          <span className="lp-file__status">PDF ready</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function LandingSections() {
   return (
     <>
-      <section className="px-4 pb-24">
-        <div className="mx-auto max-w-5xl">
-          <Reveal>
-            <div className="grid gap-0 overflow-hidden rounded-3xl border border-border bg-card shadow-sm md:grid-cols-3">
-              {stats.map((stat, i) => (
-                <div
-                  key={stat.label}
-                  className={cn(
-                    "flex h-full flex-col items-center justify-center gap-1.5 px-6 py-9 text-center",
-                    i > 0 &&
-                      "border-t border-border md:border-t-0 md:border-l"
-                  )}
-                >
-                  <p className="text-4xl font-bold tracking-tight text-foreground">
-                    <AnimatedNumber value={stat.value} suffix={stat.suffix} />
-                  </p>
-                  <p className="text-sm leading-snug text-muted-foreground">
-                    {stat.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
+      <section className="lp-stats" aria-label="By the numbers">
+        <div className="lp-container">
+          <div className="lp-stats__grid">
+            {stats.map((stat) => (
+              <div key={stat.label} className="lp-stats__cell">
+                <p className="lp-stats__value">
+                  <AnimatedNumber value={stat.value} suffix={stat.suffix} />
+                </p>
+                <p className="lp-stats__label">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section id="how-it-works" className="scroll-mt-28 px-4 py-20 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeading
-            eyebrow="How it works"
-            title="Three steps to a resume or letter you actually like"
-            text="No forms, no drag and drop. You just talk."
-          />
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
+      <section id="how-it-works" className="lp-band scroll-mt-24">
+        <div className="lp-container">
+          <div className="lp-band__head">
+            <p className="lp-band__lead">How it works</p>
+            <h2 className="lp-band__title">
+              Three steps to a resume or letter you <em>actually like</em>
+            </h2>
+          </div>
+          <div className="lp-steps">
             {steps.map((step, i) => (
-              <Reveal key={step.number} delay={i * 120} className="h-full">
-                <div className={cn("h-full rounded-2xl border border-border bg-card p-6", cardHover)}>
-                  <div className="flex items-center justify-between">
-                    <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                      <step.icon className="size-5" />
-                    </span>
-                    <span className="text-2xl font-bold tracking-tight text-foreground/10">
-                      {step.number}
-                    </span>
-                  </div>
-                  <h3 className="mt-5 text-lg font-semibold text-foreground">
-                    {step.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {step.text}
-                  </p>
+              <Reveal key={step.num} delay={i * 90} className="h-full">
+                <div className="lp-step h-full">
+                  <p className="lp-step__num">{step.num}</p>
+                  <h3 className="lp-step__title">{step.title}</h3>
+                  <p className="lp-step__text">{step.text}</p>
                 </div>
               </Reveal>
             ))}
@@ -169,97 +207,76 @@ export function LandingSections() {
         </div>
       </section>
 
-      <section id="features" className="scroll-mt-28 bg-muted/40 px-4 py-20 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeading
-            eyebrow="Features"
-            title="Everything an application needs, nothing it doesn't"
-            text="Focused on the one thing that matters: getting you hired."
-          />
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
-            {features.map((feature, i) => (
-              <Reveal key={feature.title} delay={i * 120} className="h-full">
-                <div className={cn("h-full rounded-2xl border border-border bg-card p-6", cardHover)}>
-                  <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <feature.icon className="size-5" />
-                  </span>
-                  <h3 className="mt-5 text-lg font-semibold text-foreground">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {feature.text}
+      <section id="features" className="scroll-mt-24">
+        <div className="lp-container">
+          {features.map((feature, i) => (
+            <Reveal
+              key={feature.title}
+              delay={i * 90}
+              className={cn("lp-feature", i % 2 === 1 && "lp-feature--flip")}
+            >
+              <div className="lp-feature__grid">
+                <div>
+                  <p className="lp-kicker lp-feature__label">
+                    <span className="lp-hero__status-dot" aria-hidden />
+                    {feature.kicker}
                   </p>
+                  <h3 className="lp-feature__title">{feature.title}</h3>
+                  <p className="lp-feature__text">{feature.text}</p>
                 </div>
-              </Reveal>
-            ))}
-          </div>
+                <div>{feature.proof}</div>
+              </div>
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      <section id="wall-of-love" className="scroll-mt-28 px-4 py-20 sm:py-24">
-        <div className="mx-auto max-w-6xl">
-          <SectionHeading
-            eyebrow="Wall of love"
-            title="People are talking their way to better resumes"
-            text="Real words from early users who traded blank pages for conversations."
-          />
-          <div className="mt-14 grid gap-6 md:grid-cols-3">
+      <section id="wall-of-love" className="scroll-mt-24">
+        <div className="lp-container">
+          <div className="mb-8">
+            <p className="lp-kicker">Wall of love</p>
+            <h2 className="mt-2 font-display text-lg font-semibold tracking-tight text-ink lg:text-xl">
+              People are talking their way to better resumes
+            </h2>
+          </div>
+          <div className="lp-quotes">
             {quotes.map((quote, i) => (
-              <Reveal key={quote.name} delay={i * 120} className="h-full">
-                <figure className={cn("flex h-full flex-col rounded-2xl border border-border bg-card p-6", cardHover)}>
-                  <blockquote className="flex-1 text-sm leading-relaxed text-foreground">
-                    &ldquo;{quote.text}&rdquo;
-                  </blockquote>
-                  <figcaption className="mt-5 flex items-center gap-3">
-                    <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-                      {quote.initials}
-                    </span>
-                    <span>
-                      <span className="block text-sm font-semibold text-foreground">
-                        {quote.name}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        {quote.role}
-                      </span>
-                    </span>
-                  </figcaption>
-                </figure>
+              <Reveal
+                key={quote.name}
+                as="figure"
+                delay={i * 80}
+                className="lp-quote"
+              >
+                <blockquote className="lp-quote__text">{quote.text}</blockquote>
+                <figcaption className="lp-quote__attrib">
+                  {quote.name}, {quote.role.toLowerCase()}
+                </figcaption>
               </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-4 pb-24">
-        <div className="mx-auto max-w-6xl">
-          <Reveal>
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-blue-700 to-blue-900 px-6 py-16 text-center shadow-2xl shadow-blue-950/20 sm:py-20">
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -top-24 -right-16 size-72 rounded-full bg-white/10 blur-3xl"
-              />
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -bottom-28 -left-16 size-72 rounded-full bg-white/10 blur-3xl"
-              />
-              <h2 className="relative mx-auto max-w-2xl text-3xl font-bold tracking-tight text-primary-foreground sm:text-4xl">
-                Ready to talk your way to a better application?
-              </h2>
-              <p className="relative mx-auto mt-4 max-w-xl text-lg text-primary-foreground/80">
-                Your first resume or cover letter takes about five minutes. No
-                account walls, no credit card.
-              </p>
-              <AuthCta
-                mode="signup"
-                redirect="/dashboard/resumes/new"
-                variant="secondary"
-                className="relative mt-8 h-11 cursor-pointer rounded-full px-6 text-base shadow-lg shadow-blue-950/30 transition-all duration-200 hover:shadow-xl"
-              >
-                Start building
-                <ArrowRight className="size-4" />
-              </AuthCta>
-            </div>
-          </Reveal>
+      <section className="lp-cta-band">
+        <div className="lp-container">
+          <p className="lp-kicker">start free</p>
+          <h2 className="lp-cta-band__title">
+            Ready to talk your way to a better application?
+          </h2>
+          <div className="lp-cta-band__row">
+            <AuthCta
+              mode="signup"
+              redirect="/dashboard/resumes/new"
+              className="lp-cta lp-focus"
+            >
+              Start building
+            </AuthCta>
+            <p className="lp-hero__micro">
+              <span>no account walls</span>
+              <span>no credit card</span>
+              <span>~5 minutes</span>
+            </p>
+          </div>
         </div>
       </section>
     </>

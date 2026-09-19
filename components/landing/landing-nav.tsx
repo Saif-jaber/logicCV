@@ -1,9 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { Command, Search } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { useAuthModal } from "./auth-modal";
 
@@ -13,75 +11,54 @@ const navLinks = [
   { label: "Wall of love", href: "#wall-of-love" },
 ];
 
-export function LandingNav() {
-  const [scrolled, setScrolled] = useState(false);
+export function LandingNav({ onOpenPalette }: { onOpenPalette: () => void }) {
   const { open } = useAuthModal();
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto mt-4 w-full max-w-6xl px-4 animate-in fade-in slide-in-from-top-4 ease-out fill-mode-both">
-        <nav
-          className={cn(
-            "flex items-center justify-between gap-4 rounded-2xl border px-4 py-3 transition-all duration-300",
-            scrolled
-              ? "border-border bg-card/95 shadow-lg shadow-black/[0.05] backdrop-blur"
-              : "border-border/70 bg-card/75 backdrop-blur"
-          )}
-        >
-          <Link
-            href="/"
-            className="group flex items-center gap-2.5 cursor-pointer"
-            aria-label="logicCV home"
-          >
-            <BrandMark className="size-8 shrink-0 transition-transform duration-200 group-hover:scale-105" />
-            <span className="text-base font-bold tracking-tight text-foreground">
-              logicCV
-            </span>
-          </Link>
+    <header className="lp-nav">
+      <div className="lp-container lp-nav__inner">
+        <Link href="/" className="lp-nav__brand lp-focus" aria-label="logicCV home">
+          <BrandMark className="size-7" />
+          <span>logicCV</span>
+        </Link>
 
-          <div className="hidden items-center gap-1 md:flex">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="group cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground"
-              >
-                {link.label}
-                <span className="mt-0.5 block h-px origin-left scale-x-0 bg-foreground transition-transform duration-300 group-hover:scale-x-100" />
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => open("signin")}
-              className={cn(
-                buttonVariants({ variant: "ghost", size: "default" }),
-                "rounded-full px-4 cursor-pointer"
-              )}
-            >
-              Sign in
-            </button>
-            <button
-              type="button"
-              onClick={() => open("signup", "/dashboard/resumes/new")}
-              className={cn(
-                buttonVariants({ variant: "default", size: "default" }),
-                "rounded-full px-4 cursor-pointer shadow-sm transition-shadow duration-200 hover:shadow-md hover:shadow-primary/20"
-              )}
-            >
-              Get started
-            </button>
-          </div>
+        <nav className="lp-nav__links" aria-label="Landing">
+          {navLinks.map((link) => (
+            <Link key={link.href} href={link.href} className="lp-focus">
+              {link.label}
+            </Link>
+          ))}
         </nav>
+
+        <div className="lp-nav__actions">
+          <button
+            type="button"
+            onClick={onOpenPalette}
+            className="lp-search lp-focus"
+            aria-label="Open command palette"
+          >
+            <Search className="size-4 shrink-0" aria-hidden />
+            <span className="lp-search__label">Go to…</span>
+            <span className="lp-search__kbd" aria-hidden>
+              <Command className="size-3" />K
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => open("signin")}
+            className="lp-cta-ghost lp-focus lp-nav__signin"
+          >
+            Sign in
+          </button>
+          <button
+            type="button"
+            onClick={() => open("signup", "/dashboard/resumes/new")}
+            className="lp-cta lp-focus"
+          >
+            Get started
+          </button>
+        </div>
       </div>
     </header>
   );

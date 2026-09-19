@@ -27,7 +27,6 @@ type BuildOption = {
   title: string;
   subtitle: string;
   icon: LucideIcon;
-  iconClassName: string;
 };
 
 const buildOptions: BuildOption[] = [
@@ -36,14 +35,12 @@ const buildOptions: BuildOption[] = [
     title: "Resume / CV",
     subtitle: "ATS-friendly resume, built as you chat.",
     icon: FileText,
-    iconClassName: "bg-blue-100 text-blue-600",
   },
   {
     href: "/dashboard/letters/new",
     title: "Cover Letter",
     subtitle: "Persuasive letter for a specific role.",
     icon: Mail,
-    iconClassName: "bg-rose-100 text-rose-600",
   },
 ];
 
@@ -101,25 +98,18 @@ export function BuildAiDialog({
                   key={option.href}
                   type="button"
                   onClick={() => handleChoose(option.href)}
-                  className="group flex items-center gap-3.5 rounded-xl border border-border bg-card p-3.5 text-left transition-colors hover:border-primary hover:bg-primary/5"
+                  className="db-option-row"
                 >
-                  <span
-                    className={cn(
-                      "flex size-10 shrink-0 items-center justify-center rounded-lg",
-                      option.iconClassName
-                    )}
-                  >
+                  <span className="db-option-row__icon">
                     <option.icon className="size-5" />
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-sm font-semibold text-foreground">
-                      {option.title}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-muted-foreground">
+                    <span className="db-option-row__title">{option.title}</span>
+                    <span className="db-option-row__sub">
                       {option.subtitle}
                     </span>
                   </span>
-                  <ChevronRight className="ml-auto size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                  <ChevronRight className="db-option-row__chevron" />
                 </button>
               ))}
             </div>

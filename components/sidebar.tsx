@@ -17,6 +17,7 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { BuildAiDialog } from "@/components/build-ai-dialog";
+import { BrandMark } from "@/components/landing/brand-mark";
 import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
 
@@ -93,19 +94,9 @@ function NavLink({
     item.href === pathname ||
     (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
-  const content = (
-    <>
-      <item.icon className="size-[18px] shrink-0" />
-      <span className={cn("truncate", collapsed && "hidden")}>{item.label}</span>
-    </>
-  );
-
-  const classes = cn(
-    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-    active ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
-    item.highlight &&
-      "border border-primary/40 bg-gradient-to-r from-primary to-blue-700 text-primary-foreground shadow-[0_0_16px_-4px] shadow-primary/60 hover:from-blue-600 hover:to-blue-800",
-    collapsed && "justify-center px-0"
+  const icon = <item.icon className="size-[18px] shrink-0" />;
+  const label = (
+    <span className={cn("truncate", collapsed && "hidden")}>{item.label}</span>
   );
 
   if (item.label === "Build with AI") {
@@ -116,7 +107,14 @@ function NavLink({
             type="button"
             onClick={open}
             aria-current={active ? "page" : undefined}
-            className={classes}
+            className={cn(
+              "group/sidebar-flex inline-flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              active
+                ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                : "bg-sidebar-accent text-sidebar-accent-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+              item.highlight && "shadow-none",
+              collapsed && "justify-center px-0"
+            )}
             title={collapsed ? item.label : undefined}
           >
             {collapsed ? (
@@ -124,16 +122,27 @@ function NavLink({
                 className="relative flex items-center justify-center"
                 data-tooltip={item.label}
               >
-                {content}
+                {icon}
               </span>
             ) : (
-              content
+              <>
+                {icon}
+                {label}
+              </>
             )}
           </button>
         )}
       />
     );
   }
+
+  const classes = cn(
+    "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+    active
+      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+    collapsed && "justify-center px-0"
+  );
 
   return (
     <Link
@@ -147,10 +156,13 @@ function NavLink({
           className="relative flex items-center justify-center"
           data-tooltip={item.label}
         >
-          {content}
+          {icon}
         </span>
       ) : (
-        content
+        <>
+          {icon}
+          {label}
+        </>
       )}
     </Link>
   );
@@ -171,36 +183,41 @@ function SidebarContent({
     <div className="flex h-full flex-col">
       <div
         className={cn(
-          "flex items-center justify-between rounded-lg bg-muted/60 py-2",
-          collapsed ? "px-2" : "px-2.5"
+          "flex items-center gap-2",
+          collapsed ? "justify-center" : "justify-between"
         )}
       >
-        {!collapsed && (
-          <span className="text-lg font-bold tracking-tight text-foreground">
-            logicCV
-          </span>
-        )}
-        {topRight ?? (
-          <button
-            type="button"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            onClick={toggleCollapsed}
-            className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        {collapsed ? (
+          <BrandMark className="size-6" />
+        ) : (
+          <Link
+            href="/dashboard"
+            className="flex min-w-0 items-center gap-2 text-sidebar-foreground"
           >
-            {collapsed ? (
-              <ChevronsRight className="size-4" />
-            ) : (
-              <ChevronsLeft className="size-4" />
-            )}
-          </button>
+            <BrandMark className="size-6" />
+            <span className="truncate font-display text-lg font-bold tracking-tight">
+              logicCV
+            </span>
+          </Link>
         )}
+        {topRight ??
+          (collapsed ? null : (
+            <button
+              type="button"
+              aria-label="Collapse sidebar"
+              onClick={toggleCollapsed}
+              className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            >
+              <ChevronsLeft className="size-4" />
+            </button>
+          ))}
       </div>
 
       <div className="flex flex-col">
         {navSections.map((section) => (
           <div key={section.label} className="mt-6">
             {!collapsed && (
-              <p className="px-3 text-xs font-medium tracking-wider text-muted-foreground uppercase">
+              <p className="px-3 font-code text-[0.625rem] uppercase tracking-[0.14em] text-sidebar-foreground/40">
                 {section.label}
               </p>
             )}
@@ -214,14 +231,24 @@ function SidebarContent({
       </div>
 
       <div className="mt-auto flex flex-col pt-6">
-        <Separator />
+        {collapsed && (
+          <button
+            type="button"
+            aria-label="Expand sidebar"
+            onClick={toggleCollapsed}
+            className="mx-auto mb-4 rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          >
+            <ChevronsRight className="size-4" />
+          </button>
+        )}
+        <Separator className="bg-sidebar-border" />
         <nav className="mt-4 flex flex-col gap-1" aria-label="Account">
           <Link
-            href="/settings"
+            href="/dashboard/settings"
             aria-label={collapsed ? "Settings" : undefined}
             title={collapsed ? "Settings" : undefined}
             className={cn(
-              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground",
+              "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
               collapsed && "justify-center px-0"
             )}
           >
@@ -238,14 +265,17 @@ function SidebarContent({
           )}
         >
           <Avatar className="size-8 shrink-0">
-            <AvatarFallback className="bg-blue-100 text-xs font-semibold text-blue-600">
+            <AvatarFallback className="bg-sidebar-accent font-code text-xs font-semibold text-sidebar-accent-foreground">
               {getInitials(user)}
             </AvatarFallback>
           </Avatar>
           {!collapsed && (
-            <span className="truncate text-sm font-medium text-foreground">
-              {getDisplayName(user)}
-            </span>
+            <>
+              <span className="truncate text-sm font-medium text-sidebar-accent-foreground">
+                {getDisplayName(user)}
+              </span>
+              <span className="ml-1 h-1.5 w-1.5 shrink-0 rounded-full bg-sidebar-primary" />
+            </>
           )}
         </div>
       </div>
@@ -259,7 +289,7 @@ function DesktopSidebar({ user }: { user?: SidebarUser }) {
   return (
     <aside
       className={cn(
-        "sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-border bg-card py-5 transition-[width] duration-200 ease-in-out md:flex",
+        "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar py-5 transition-[width] duration-200 ease-in-out md:flex",
         collapsed ? "w-16 px-2.5" : "w-60 px-5"
       )}
     >
@@ -295,14 +325,14 @@ function MobileSidebar({ user }: { user?: SidebarUser }) {
     >
       <div
         className={cn(
-          "absolute inset-0 bg-black/40 transition-opacity duration-300",
+          "absolute inset-0 bg-sidebar/55 transition-opacity duration-300",
           mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={closeMobile}
       />
       <aside
         className={cn(
-          "absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-border bg-card px-4 py-5 shadow-xl transition-transform duration-300 ease-in-out",
+          "absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col border-r border-sidebar-border bg-sidebar px-4 py-5 shadow-xl shadow-black/30 transition-transform duration-300 ease-in-out",
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
         role="dialog"
@@ -315,7 +345,7 @@ function MobileSidebar({ user }: { user?: SidebarUser }) {
               type="button"
               aria-label="Close sidebar"
               onClick={closeMobile}
-              className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="rounded-md p-1 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
             >
               <X className="size-4" />
             </button>

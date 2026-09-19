@@ -70,11 +70,21 @@ export function DocumentCard({
   }
 
   const preview = href ? (
-    <Link href={href} aria-label={`Open ${name}`} className="block aspect-[3/4] w-full">
-      {children}
+    <Link
+      href={href}
+      aria-label={`Open ${name}`}
+      className="db-doc-stage aspect-[3/4] w-full"
+    >
+      <span className="db-doc-page relative block h-full w-full overflow-hidden bg-white">
+        {children}
+      </span>
     </Link>
   ) : (
-    <div className="aspect-[3/4] w-full">{children}</div>
+    <div className="db-doc-stage aspect-[3/4] w-full">
+      <div className="db-doc-page relative block h-full w-full overflow-hidden bg-white">
+        {children}
+      </div>
+    </div>
   );
 
   const title =
@@ -101,30 +111,30 @@ export function DocumentCard({
         <button
           type="submit"
           aria-label="Save name"
-          className="shrink-0 rounded-full p-1 text-emerald-600 transition-colors hover:bg-muted"
+          className="db-icon-btn shrink-0 text-success-strong"
         >
           <Check className="size-3.5" />
         </button>
       </form>
     ) : href ? (
       <Link href={href} className="block min-w-0">
-        <p className="truncate text-sm font-semibold text-foreground">{name}</p>
+        <p className="db-doc-name">{name}</p>
       </Link>
     ) : (
-      <p className="truncate text-sm font-semibold text-foreground">{name}</p>
+      <p className="db-doc-name">{name}</p>
     );
 
   const actions = onRename || onDelete ? (
     <Menu.Root>
       <Menu.Trigger
         aria-label={`More options for ${name}`}
-        className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        className="db-doc-menu"
       >
-        <MoreVertical className="size-4" />
+        <MoreVertical />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner sideOffset={6} align="end" className="z-50">
-          <Menu.Popup className="min-w-40 rounded-lg border border-border bg-popover p-1 shadow-lg shadow-black/5 outline-none">
+          <Menu.Popup className="min-w-40 rounded-lg border border-border bg-popover p-1 shadow-lg shadow-black/10 outline-none">
             {onRename && (
               <Menu.Item
                 onClick={() => {
@@ -142,7 +152,7 @@ export function DocumentCard({
                 <Menu.Separator className="my-1 h-px bg-border" />
                 <Menu.Item
                   onClick={() => setDeleteOpen(true)}
-                  className="flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-red-600 outline-none select-none data-highlighted:bg-red-50"
+                  className="flex cursor-default items-center gap-2 rounded-md px-2.5 py-1.5 text-sm text-destructive outline-none select-none data-highlighted:bg-muted/70"
                 >
                   <Trash2 className="size-3.5" />
                   Delete
@@ -154,24 +164,18 @@ export function DocumentCard({
       </Menu.Portal>
     </Menu.Root>
   ) : (
-    <button
-      type="button"
-      aria-label={`More options for ${name}`}
-      className="shrink-0 rounded-full p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-    >
-      <MoreVertical className="size-4" />
+    <button type="button" aria-label={`More options for ${name}`} className="db-doc-menu">
+      <MoreVertical />
     </button>
   );
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-border bg-card transition-shadow hover:shadow-sm">
+    <article className="db-doc-card group">
       {preview}
-      <div className="flex items-center justify-between gap-2 px-2.5 py-2.5">
+      <div className="db-doc-meta">
         <div className="min-w-0">
           {title}
-          <p className="mt-0.5 truncate text-xs text-muted-foreground">
-            {updatedAt}
-          </p>
+          <p className="db-doc-date">{updatedAt}</p>
         </div>
         {actions}
       </div>

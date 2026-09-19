@@ -6,7 +6,6 @@ import {
   FileUser,
   LayoutTemplate,
   Mail,
-  Menu,
   Search,
   FileText,
   X,
@@ -16,7 +15,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { BuildAiDialog } from "@/components/build-ai-dialog";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DocumentCard } from "@/components/document-card";
 import { DocumentPreview } from "@/components/document-preview";
@@ -30,7 +28,6 @@ import {
   renameLetterAction,
   renameResumeAction,
 } from "@/app/actions/documents";
-import { useSidebar } from "@/lib/sidebar-context";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -38,7 +35,6 @@ export interface FeatureCard {
   title: string;
   subtitle: string;
   icon: LucideIcon;
-  badgeClassName: string;
 }
 
 const featureCards: FeatureCard[] = [
@@ -46,25 +42,21 @@ const featureCards: FeatureCard[] = [
     title: "CV / Resume",
     subtitle: "Better Resume Builder",
     icon: FileUser,
-    badgeClassName: "bg-emerald-100 text-emerald-600",
   },
   {
     title: "Templates",
     subtitle: "Stand out with pro templates",
     icon: LayoutTemplate,
-    badgeClassName: "bg-blue-100 text-blue-600",
   },
   {
     title: "ATS Check",
     subtitle: "Optimized for hiring software",
     icon: ClipboardCheck,
-    badgeClassName: "bg-violet-100 text-violet-600",
   },
   {
     title: "Letters",
     subtitle: "Cover & application letters",
     icon: Mail,
-    badgeClassName: "bg-rose-100 text-rose-600",
   },
 ];
 
@@ -75,7 +67,6 @@ export function DashboardContent({
   resumes: StoredResume[];
   letters: StoredLetter[];
 }) {
-  const { openMobile } = useSidebar();
   const router = useRouter();
   const [search, setSearch] = useState("");
 
@@ -112,38 +103,28 @@ export function DashboardContent({
 
   return (
     <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Open menu"
-            className="rounded-full text-foreground hover:bg-muted md:hidden"
-            onClick={openMobile}
-          >
-            <Menu className="size-5" />
-          </Button>
-          <h1 className="text-xl font-bold tracking-tight text-foreground uppercase">
-            Overview
-          </h1>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <span className="db-kicker">Overview</span>
+          <h1 className="db-title">Your documents</h1>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 rounded-full border border-border bg-transparent px-3 py-1.5 transition-colors focus-within:border-ring">
+          <div className="db-search db-focus">
             <Search className="size-4 shrink-0 text-muted-foreground" />
             <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search files..."
               aria-label="Search all files"
-              className="h-6 w-32 rounded-none border-none p-0 shadow-none focus-visible:ring-0 sm:w-48 lg:w-56"
+              className="h-6 w-28 rounded-none border-none bg-transparent p-0 shadow-none focus-visible:ring-0 sm:w-44 lg:w-56"
             />
             {search !== "" && (
               <button
                 type="button"
                 aria-label="Clear search"
                 onClick={() => setSearch("")}
-                className="rounded-full p-0.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                className="db-icon-btn -m-1 h-6 w-6"
               >
                 <X className="size-3.5" />
               </button>
@@ -155,42 +136,29 @@ export function DashboardContent({
 
       <section className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
         {featureCards.map((feature) => (
-          <Card
-            key={feature.title}
-            className="flex-row items-center gap-3 border border-border ring-0 bg-card p-3.5 sm:gap-4 sm:p-4"
-          >
-            <div
-              className={cn(
-                "flex size-9 shrink-0 items-center justify-center rounded-lg sm:size-10",
-                feature.badgeClassName
-              )}
-            >
-              <feature.icon className="size-[18px] sm:size-5" />
+          <div key={feature.title} className="db-tile">
+            <span className="db-tile__icon">
+              <feature.icon className="size-5" />
+            </span>
+            <div className="db-tile__copy">
+              <p className="db-tile__title">{feature.title}</p>
+              <p className="db-tile__sub">{feature.subtitle}</p>
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-foreground">
-                {feature.title}
-              </p>
-              <p className="mt-0.5 truncate text-xs text-muted-foreground">
-                {feature.subtitle}
-              </p>
-            </div>
-          </Card>
+          </div>
         ))}
       </section>
 
-      <section className="mt-8">
-        <div className="flex items-center justify-between gap-3">
+      <section className="mt-10">
+        <div className="db-section-head">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-foreground">
-              My Resumes
-            </h2>
+            <h2 className="db-section-title">My Resumes</h2>
+            <span className="db-label-mono">/{resumes.length}</span>
             {search !== "" && (
               <Button
                 variant="ghost"
                 size="icon"
                 aria-label="Clear search"
-                className="size-7 rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                className="db-icon-btn size-7"
                 onClick={() => setSearch("")}
               >
                 <X className="size-3.5" />
@@ -200,17 +168,17 @@ export function DashboardContent({
           <Link
             href="/dashboard/resumes"
             className={cn(
-              buttonVariants({ variant: "outline" }),
-              "rounded-full"
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "db-section-link"
             )}
           >
-            View All
+            View all
             <ChevronRight className="size-4" />
           </Link>
         </div>
 
         {filteredDocuments.length > 0 ? (
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
+          <div className="db-doc-grid mt-4">
             {filteredDocuments.map((document) => (
               <DocumentCard
                 key={document.id}
@@ -228,22 +196,24 @@ export function DashboardContent({
             ))}
           </div>
         ) : (
-          <div className="mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
-            <FileText className="size-8 text-muted-foreground" />
-            <p className="text-sm font-medium text-foreground">
-              {normalized === "" ? "No resumes found" : "No resumes match your search"}
+          <div className="db-empty mt-4">
+            <span className="db-empty__icon">
+              <FileText className="size-5" />
+            </span>
+            <p className="db-empty__title">
+              {normalized === "" ? "No resumes yet" : "No matching resumes"}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="db-empty__copy">
               {normalized === ""
                 ? "Start a new resume with the AI builder."
                 : "Try a different search term."}
             </p>
             {normalized === "" ? (
-              <BuildAiDialog className="rounded-full" />
+              <BuildAiDialog className="mt-2 rounded-full" />
             ) : (
               <Button
                 variant="outline"
-                className="rounded-full"
+                className="mt-2 rounded-full"
                 onClick={() => setSearch("")}
               >
                 Clear search
@@ -253,27 +223,26 @@ export function DashboardContent({
         )}
       </section>
 
-      <section className="mt-8">
-        <div className="flex items-center justify-between gap-3">
+      <section className="mt-10">
+        <div className="db-section-head">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold text-foreground">
-              My Letters
-            </h2>
+            <h2 className="db-section-title">My Letters</h2>
+            <span className="db-label-mono">/{letters.length}</span>
           </div>
           <Link
             href="/dashboard/letters"
             className={cn(
-              buttonVariants({ variant: "outline" }),
-              "rounded-full"
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "db-section-link"
             )}
           >
-            View All
+            View all
             <ChevronRight className="size-4" />
           </Link>
         </div>
 
         {filteredLetters.length > 0 ? (
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] sm:gap-4">
+          <div className="db-doc-grid mt-4">
             {filteredLetters
               .slice(0, normalized === "" ? 4 : filteredLetters.length)
               .map((document) => (
@@ -293,23 +262,29 @@ export function DashboardContent({
               ))}
           </div>
         ) : (
-          <div className="mt-4 flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-card/50 px-6 py-16 text-center">
-            <Mail className="size-8 text-muted-foreground" />
-            <p className="text-sm font-medium text-foreground">
-              {normalized === "" ? "No letters found" : "No letters match your search"}
+          <div className="db-empty mt-4">
+            <span className="db-empty__icon">
+              <Mail className="size-5" />
+            </span>
+            <p className="db-empty__title">
+              {normalized === "" ? "No letters yet" : "No matching letters"}
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="db-empty__copy">
               {normalized === ""
                 ? "Start a new letter with the AI builder."
                 : "Try a different search term."}
             </p>
-            <Button
-              variant="outline"
-              className="rounded-full"
-              onClick={() => setSearch("")}
-            >
-              Clear search
-            </Button>
+            {normalized === "" ? (
+              <BuildAiDialog className="mt-2 rounded-full" />
+            ) : (
+              <Button
+                variant="outline"
+                className="mt-2 rounded-full"
+                onClick={() => setSearch("")}
+              >
+                Clear search
+              </Button>
+            )}
           </div>
         )}
       </section>

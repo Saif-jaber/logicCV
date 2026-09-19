@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { Sidebar } from "@/components/sidebar";
+import { MobileNavBar } from "@/components/dashboard/mobile-nav";
 import { SidebarProvider } from "@/lib/sidebar-context";
+import "./dashboard.css";
 
 export default async function DashboardLayout({
   children,
@@ -10,10 +12,13 @@ export default async function DashboardLayout({
   const session = await auth();
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="db-shell flex min-h-screen bg-background text-foreground">
       <SidebarProvider>
         <Sidebar user={session?.user} />
-        {children}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <MobileNavBar />
+          {children}
+        </div>
       </SidebarProvider>
     </div>
   );

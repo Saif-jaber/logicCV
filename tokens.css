@@ -1,0 +1,76 @@
+/* Hallmark · genre: modern-minimal · macrostructure: Split Studio · theme: Cobalt
+ * paper: light (>85%, hue ~250) · display style: grotesk-sans · accent hue: cool (hue ~256)
+ */
+
+:root {
+  --color-paper: oklch(98.5% 0.004 250);
+  --color-paper-2: oklch(96.5% 0.006 250);
+  --color-paper-glass: oklch(98.5% 0.004 250 / 0.82);
+  --color-ink: oklch(24% 0.02 258);
+  --color-ink-2: oklch(34% 0.018 257);
+  --color-rule: oklch(91% 0.01 252);
+  --color-rule-2: oklch(84% 0.012 252);
+  --color-accent: oklch(58% 0.2 256);
+  --color-accent-ink: oklch(99% 0.004 250);
+  --color-graphite: oklch(22% 0.016 260);
+  --color-graphite-2: oklch(30% 0.016 258);
+  --color-focus: oklch(50% 0.21 256);
+  --color-accent-strong: oklch(50% 0.21 256);
+  --color-accent-soft: oklch(74% 0.19 256);
+  --color-graphite-hairline: oklch(30% 0.016 258 / 0.9);
+  --color-graphite-soft: oklch(30% 0.016 258 / 0.5);
+  --color-graphite-veil: oklch(22% 0.016 260 / 0.55);
+  --color-graphite-shadow: oklch(22% 0.016 260 / 0.18);
+  --color-on-graphite: oklch(94% 0.006 250);
+  --color-on-graphite-2: oklch(70% 0.01 250);
+  --color-on-graphite-strong: oklch(96% 0.005 250);
+  --color-danger: oklch(55% 0.19 27);
+  --color-danger-mid: oklch(70% 0.14 27);
+  --color-danger-soft: oklch(94% 0.04 27);
+  --color-success: oklch(55% 0.13 152);
+  --color-success-strong: oklch(45% 0.13 152);
+  --color-success-soft: oklch(93% 0.03 152);
+
+  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-body: var(--font-sans), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --space-3xs: 0.125rem;
+  --space-2xs: 0.25rem;
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2.5rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+  --space-4xl: 9rem;
+
+  --text-xs: 0.64rem;
+  --text-sm: 0.8rem;
+  --text-base: 1rem;
+  --text-md: 1.25rem;
+  --text-lg: 1.5625rem;
+  --text-xl: 1.9531rem;
+  --text-2xl: 2.4414rem;
+  --text-3xl: 3.0518rem;
+  --text-4xl: 3.8147rem;
+  --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-display-s: clamp(2rem, 4vw + 0.75rem, 3.5rem);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+  --dur-long: 420ms;
+
+  --radius-card: 10px;
+  --radius-ctrl: 6px;
+
+  --z-sticky: 200;
+  --z-modal: 400;
+  --z-tooltip: 600;
+  --z-cmdk: 700;
+}
