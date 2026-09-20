@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   },
   description:
     "Build a standout CV/resume by talking to an AI assistant. logicCV writes an ATS-friendly resume as you chat, with a live preview and export.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

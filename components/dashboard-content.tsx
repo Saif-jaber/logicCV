@@ -4,7 +4,6 @@ import {
   ChevronRight,
   ClipboardCheck,
   FileUser,
-  LayoutTemplate,
   Mail,
   Search,
   FileText,
@@ -42,11 +41,6 @@ const featureCards: FeatureCard[] = [
     title: "CV / Resume",
     subtitle: "Better Resume Builder",
     icon: FileUser,
-  },
-  {
-    title: "Templates",
-    subtitle: "Stand out with pro templates",
-    icon: LayoutTemplate,
   },
   {
     title: "ATS Check",
