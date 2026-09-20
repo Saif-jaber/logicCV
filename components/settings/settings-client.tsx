@@ -76,6 +76,7 @@ function ProfileForm({ user }: { user: SettingsUser }) {
           Full name
         </label>
         <Input
+          key={`name-${user.name ?? ""}`}
           id="settings-name"
           name="name"
           defaultValue={user.name ?? ""}
@@ -99,6 +100,7 @@ function ProfileForm({ user }: { user: SettingsUser }) {
           Email
         </label>
         <Input
+          key={`email-${user.email ?? ""}`}
           id="settings-email"
           type="email"
           name="email"

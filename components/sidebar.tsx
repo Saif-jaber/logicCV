@@ -8,12 +8,14 @@ import {
   ChevronsRight,
   FileText,
   LayoutGrid,
+  LogOut,
   Mail,
   Settings,
   Sparkles,
   X,
   type LucideIcon,
 } from "lucide-react";
+import { signOutAction } from "@/app/actions/auth";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { BuildAiDialog } from "@/components/build-ai-dialog";
@@ -257,6 +259,22 @@ function SidebarContent({
               Settings
             </span>
           </Link>
+          <form action={signOutAction}>
+            <button
+              type="submit"
+              aria-label={collapsed ? "Sign out" : undefined}
+              title={collapsed ? "Sign out" : undefined}
+              className={cn(
+                "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+                collapsed && "justify-center px-0"
+              )}
+            >
+              <LogOut className="size-[18px] shrink-0" />
+              <span className={cn("truncate", collapsed && "hidden")}>
+                Sign out
+              </span>
+            </button>
+          </form>
         </nav>
         <div
           className={cn(
