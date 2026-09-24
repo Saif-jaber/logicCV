@@ -239,7 +239,7 @@ export function LetterBuilder({
       <div className="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6 lg:h-[calc(100dvh-8rem)]">
         <section
           aria-label="Chat with the letter assistant"
-          className="db-panel h-[50dvh] min-h-[320px] sm:h-[60dvh] sm:min-h-[400px] lg:h-full"
+          className="db-panel h-[70dvh] min-h-[420px] sm:h-[60dvh] sm:min-h-[400px] lg:h-full"
         >
           <div className="db-panel__head">
             <div className="flex items-center gap-2.5">
