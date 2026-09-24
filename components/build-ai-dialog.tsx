@@ -104,8 +104,8 @@ export function BuildAiDialog({
                     <option.icon className="size-5" />
                   </span>
                   <span className="min-w-0">
-                    <span className="db-option-row__title">{option.title}</span>
-                    <span className="db-option-row__sub">
+                    <span className="db-option-row__title block">{option.title}</span>
+                    <span className="db-option-row__sub hidden sm:block">
                       {option.subtitle}
                     </span>
                   </span>
