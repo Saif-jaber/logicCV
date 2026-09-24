@@ -3,8 +3,7 @@ services:
     name: logiccv
     runtime: node
     plan: free
-    buildCommand: npm install && npx prisma generate && npm run build
-    preDeployCommand: npx prisma migrate deploy
+    buildCommand: npm install && npx prisma migrate deploy && npx prisma generate && npm run build
     startCommand: npm run start
     healthCheckPath: /
     envVars:
