@@ -450,6 +450,7 @@
 
 .db-bubble-ai .db-bubble-body {
   max-width: 85%;
+  min-width: 0;
   padding: 0.375rem 0.75rem;
   border-radius: var(--radius-md);
   border-bottom-left-radius: 0.25rem;

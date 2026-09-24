@@ -315,7 +315,7 @@ export function LetterBuilder({
           </div>
 
           <div className="db-composer">
-            <div className="flex flex-1 flex-col gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
               {state.suggestions.length > 0 && (
                 <div className="-mb-2 flex items-center gap-1.5 overflow-x-auto pb-2 md:flex-wrap md:overflow-visible">
                   {state.suggestions.map((suggestion) => (
