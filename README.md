@@ -158,8 +158,6 @@ proxy.ts             Route-level auth and role protection
 - [x] Users `role` column (`user` / `admin`) with admin area and role-based route protection
 - [x] Live AI generation via Groq with retries and JSON-schema validation
 - [x] Profile and password settings page
-- [ ] Multi-plan / paid tiers and usage limits
-- [ ] Shared (team) workspaces for resumes and letters
 
 ## License
 
