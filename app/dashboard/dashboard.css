@@ -687,6 +687,13 @@
   color: var(--color-ink-2);
 }
 
+@media (max-width: 639px) {
+  .db-chip--low {
+    font-size: 0.4375rem;
+    font-weight: 700;
+  }
+}
+
 /* ————— dialogs ————— */
 
 .db-option-row {
