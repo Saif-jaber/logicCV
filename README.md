@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="app/icon.svg" width="96" height="96" alt="logicCV logo" />
+  <img src="public/logo.png" width="96" height="96" alt="logicCV logo" />
 </p>
 
 <h1 align="center">logicCV</h1>
