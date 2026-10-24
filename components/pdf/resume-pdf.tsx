@@ -1,133 +1,274 @@
 import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import type { Resume } from "@/lib/resume";
+import { getResumeFontFamily } from "@/lib/resume";
+import type {
+  Resume,
+  ResumeAdditional,
+  ResumeFontFamily,
+} from "@/lib/resume";
 
-const LINE_HEIGHT = 1.5;
+const LINE_HEIGHT = 1.2;
 
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
-    fontFamily: "Helvetica",
+    paddingVertical: 43.2,
+    paddingHorizontal: 50.4,
+    fontFamily: "Times-Roman",
     fontSize: 10,
-    color: "#111827",
+    color: "#000000",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: 4,
   },
   name: {
-    fontSize: 22,
-    fontFamily: "Helvetica-Bold",
-    color: "#111827",
-    lineHeight: 1.2,
+    fontSize: 20,
+    fontFamily: "Times-Bold",
+    lineHeight: LINE_HEIGHT,
+    textTransform: "uppercase",
   },
   title: {
-    fontSize: 12,
-    fontFamily: "Helvetica-Bold",
-    color: "#4b5563",
-    lineHeight: 1.3,
+    fontSize: 11,
+    lineHeight: LINE_HEIGHT,
   },
   contact: {
-    fontSize: 9,
-    color: "#6b7280",
+    fontSize: 10,
     lineHeight: LINE_HEIGHT,
+    marginTop: 2,
   },
   sectionTitle: {
     fontSize: 11,
-    fontFamily: "Helvetica-Bold",
-    color: "#111827",
-    borderBottomWidth: 1,
-    borderBottomColor: "#d1d5db",
+    fontFamily: "Times-Bold",
+    borderBottomWidth: 0.75,
+    borderBottomColor: "#000000",
     paddingBottom: 4,
-    marginTop: 20,
-    marginBottom: 10,
-    lineHeight: 1.3,
+    marginTop: 10,
+    marginBottom: 4,
+    lineHeight: LINE_HEIGHT,
+    textTransform: "uppercase",
   },
-  roleRow: {
+  row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "baseline",
   },
-  role: {
-    fontSize: 11,
-    fontFamily: "Helvetica-Bold",
-    color: "#111827",
-    lineHeight: 1.3,
+  company: {
+    fontFamily: "Times-Bold",
+    textTransform: "uppercase",
   },
-  period: {
-    fontSize: 9,
-    color: "#6b7280",
-    lineHeight: 1.3,
+  role: {
+    fontFamily: "Times-Bold",
   },
   bodyText: {
     fontSize: 10,
     lineHeight: LINE_HEIGHT,
-    color: "#374151",
   },
   bullet: {
     flexDirection: "row",
-    marginTop: 2,
-    marginBottom: 3,
+    marginBottom: 2,
+    lineHeight: LINE_HEIGHT,
   },
-  bulletDot: {
-    width: 12,
+  bulletGlyph: {
+    width: 14,
     fontSize: 10,
     lineHeight: LINE_HEIGHT,
-    color: "#374151",
+  },
+  nestedBulletGlyph: {
+    width: 32,
+    fontSize: 10,
+    lineHeight: LINE_HEIGHT,
   },
   bulletText: {
     flex: 1,
     fontSize: 10,
     lineHeight: LINE_HEIGHT,
-    color: "#374151",
   },
   entry: {
-    marginBottom: 12,
+    marginBottom: 6,
   },
-  projectName: {
+  selectedProjects: {
+    marginTop: 2,
+  },
+  selectedProjectsTitle: {
+    fontFamily: "Times-Bold",
     fontSize: 10,
-    fontFamily: "Helvetica-Bold",
-    color: "#111827",
-    lineHeight: 1.3,
+    lineHeight: LINE_HEIGHT,
+    marginBottom: 2,
   },
 });
 
-function SectionHeading({ children }: { children: string }) {
-  return <Text style={styles.sectionTitle}>{children}</Text>;
+function getPdfFontNames(fontFamily: ResumeFontFamily) {
+  if (fontFamily === "sans") {
+    return { regular: "Helvetica", bold: "Helvetica-Bold" };
+  }
+  if (fontFamily === "mono") {
+    return { regular: "Courier", bold: "Courier-Bold" };
+  }
+  return { regular: "Times-Roman", bold: "Times-Bold" };
+}
+
+function SectionHeading({
+  children,
+  boldFont,
+}: {
+  children: string;
+  boldFont: string;
+}) {
+  return (
+    <Text style={[styles.sectionTitle, { fontFamily: boldFont }]}>
+      {children}
+    </Text>
+  );
+}
+
+function Bullet({
+  children,
+  nested = false,
+  regularFont,
+}: {
+  children: React.ReactNode;
+  nested?: boolean;
+  regularFont: string;
+}) {
+  return (
+    <View style={styles.bullet}>
+      <Text style={nested ? styles.nestedBulletGlyph : styles.bulletGlyph}>
+        {nested ? "-" : "\u2022"}
+      </Text>
+      <Text style={[styles.bulletText, { fontFamily: regularFont }]}>
+        {children}
+      </Text>
+    </View>
+  );
+}
+
+function getAdditionalInformation(resume: Resume): ResumeAdditional[] {
+  const additional = [...(resume.additional ?? [])];
+  const labels = new Set(
+    additional.map(({ label }) => label.trim().toLowerCase())
+  );
+
+  if (
+    resume.summary.trim() &&
+    !labels.has("professional summary") &&
+    !labels.has("summary")
+  ) {
+    additional.push({
+      label: "Professional Summary",
+      items: [resume.summary.trim()],
+    });
+  }
+
+  if (
+    resume.skills.length > 0 &&
+    !labels.has("technical skills") &&
+    !labels.has("skills")
+  ) {
+    additional.push({ label: "Technical Skills", items: resume.skills });
+  }
+
+  if (resume.projects.length > 0 && !labels.has("projects")) {
+    additional.push({
+      label: "Projects",
+      items: resume.projects.map(({ name, description }) =>
+        description ? `${name}: ${description}` : name
+      ),
+    });
+  }
+
+  return additional;
 }
 
 export function ResumePdf({ resume }: { resume: Resume }) {
-  const contacts = [resume.email, resume.phone, resume.location]
+  const contacts = [resume.location, resume.email, resume.phone]
     .filter(Boolean)
-    .join("   |   ");
+    .join("   \u2022   ");
+  const additional = getAdditionalInformation(resume);
+  const font = getPdfFontNames(getResumeFontFamily(resume));
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
-        {resume.name && <Text style={styles.name}>{resume.name}</Text>}
-        {resume.title && <Text style={styles.title}>{resume.title}</Text>}
-        {contacts && <Text style={styles.contact}>{contacts}</Text>}
-
-        {resume.summary.trim().length > 0 && (
-          <View>
-            <SectionHeading>SUMMARY</SectionHeading>
-            <Text style={styles.bodyText}>{resume.summary}</Text>
-          </View>
-        )}
+      <Page size="LETTER" style={[styles.page, { fontFamily: font.regular }]}>
+        <View style={styles.header}>
+          {resume.name && (
+            <Text style={[styles.name, { fontFamily: font.bold }]}>
+              {resume.name}
+            </Text>
+          )}
+          {resume.title && <Text style={styles.title}>{resume.title}</Text>}
+          {contacts && <Text style={styles.contact}>{contacts}</Text>}
+        </View>
 
         {resume.experience.length > 0 && (
           <View>
-            <SectionHeading>EXPERIENCE</SectionHeading>
-            {resume.experience.map((exp) => (
-              <View key={exp.id} style={styles.entry}>
-                {exp.role && (
-                  <View style={styles.roleRow}>
-                    <Text style={styles.role}>{exp.role}</Text>
-                    {exp.period && <Text style={styles.period}>{exp.period}</Text>}
+            <SectionHeading boldFont={font.bold}>
+              PROFESSIONAL EXPERIENCE
+            </SectionHeading>
+            {resume.experience.map((experience) => (
+              <View key={experience.id} style={styles.entry}>
+                <View style={styles.row}>
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      styles.company,
+                      { fontFamily: font.bold },
+                    ]}
+                  >
+                    {experience.company}
+                  </Text>
+                  {experience.location && (
+                    <Text style={styles.bodyText}>{experience.location}</Text>
+                  )}
+                </View>
+                <View style={styles.row}>
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      styles.role,
+                      { fontFamily: font.bold },
+                    ]}
+                  >
+                    {experience.role}
+                  </Text>
+                  {experience.period && (
+                    <Text style={styles.bodyText}>{experience.period}</Text>
+                  )}
+                </View>
+                {experience.bullets.map((bullet, index) => (
+                  <Bullet
+                    key={`${experience.id}-bullet-${index}`}
+                    regularFont={font.regular}
+                  >
+                    {bullet}
+                  </Bullet>
+                ))}
+                {experience.projects && experience.projects.length > 0 && (
+                  <View style={styles.selectedProjects}>
+                    <Text
+                      style={[
+                        styles.selectedProjectsTitle,
+                        { fontFamily: font.bold },
+                      ]}
+                    >
+                      Selected Project Experience
+                    </Text>
+                    {experience.projects.map((project) => (
+                      <View key={project.id}>
+                        <Bullet regularFont={font.regular}>
+                          {project.name}
+                        </Bullet>
+                        {project.bullets.map((bullet, index) => (
+                          <Bullet
+                            key={`${project.id}-bullet-${index}`}
+                            nested
+                            regularFont={font.regular}
+                          >
+                            {bullet}
+                          </Bullet>
+                        ))}
+                      </View>
+                    ))}
                   </View>
                 )}
-                {exp.company && <Text style={styles.bodyText}>{exp.company}</Text>}
-                {exp.bullets.map((bullet, i) => (
-                  <View key={i} style={styles.bullet}>
-                    <Text style={styles.bulletDot}>{"\u2022"}</Text>
-                    <Text style={styles.bulletText}>{bullet}</Text>
-                  </View>
-                ))}
               </View>
             ))}
           </View>
@@ -135,44 +276,64 @@ export function ResumePdf({ resume }: { resume: Resume }) {
 
         {resume.education.length > 0 && (
           <View>
-            <SectionHeading>EDUCATION</SectionHeading>
-            {resume.education.map((edu) => (
-              <View key={edu.id} style={styles.entry}>
-                <View style={styles.roleRow}>
-                  <Text style={styles.role}>{edu.degree}</Text>
-                  {edu.period && <Text style={styles.period}>{edu.period}</Text>}
+            <SectionHeading boldFont={font.bold}>EDUCATION</SectionHeading>
+            {resume.education.map((education) => (
+              <View key={education.id} style={styles.entry}>
+                <View style={styles.row}>
+                  <Text
+                    style={[
+                      styles.bodyText,
+                      styles.company,
+                      { fontFamily: font.bold },
+                    ]}
+                  >
+                    {education.school}
+                  </Text>
+                  {education.location && (
+                    <Text style={styles.bodyText}>{education.location}</Text>
+                  )}
                 </View>
-                {edu.school && <Text style={styles.bodyText}>{edu.school}</Text>}
+                <View style={styles.row}>
+                  <Text style={styles.bodyText}>{education.degree}</Text>
+                  {education.period && (
+                    <Text style={styles.bodyText}>{education.period}</Text>
+                  )}
+                </View>
               </View>
             ))}
           </View>
         )}
 
-        {resume.projects.length > 0 && (
-          <View>
-            <SectionHeading>PROJECTS</SectionHeading>
-            {resume.projects.map((project) => (
-              <View key={project.id} style={styles.entry}>
-                {project.name && (
-                  <Text style={styles.projectName}>{project.name}</Text>
-                )}
-                {project.description && (
-                  <Text style={styles.bodyText}>{project.description}</Text>
-                )}
-              </View>
+        {resume.customSections?.map((section) => (
+          <View key={section.id}>
+            <SectionHeading boldFont={font.bold}>
+              {section.title}
+            </SectionHeading>
+            {section.items.map((item, index) => (
+              <Bullet
+                key={`${section.id}-item-${index}`}
+                regularFont={font.regular}
+              >
+                {item}
+              </Bullet>
             ))}
           </View>
-        )}
+        ))}
 
-        {resume.skills.length > 0 && (
+        {additional.length > 0 && (
           <View>
-            <SectionHeading>SKILLS</SectionHeading>
-            {resume.skills.map((skill) => (
-              <View key={skill} style={styles.bullet}>
-                <Text style={styles.bulletDot}>{"\u2022"}</Text>
-                <Text style={styles.bulletText}>{skill}</Text>
-              </View>
-            ))}
+            <SectionHeading boldFont={font.bold}>
+              ADDITIONAL INFORMATION
+            </SectionHeading>
+            {additional.map(
+              ({ label, items }) =>
+                items.length > 0 && (
+                <Bullet key={label} regularFont={font.regular}>
+                  <Text style={{ fontFamily: font.bold }}>{label}:</Text>
+                    <Text> {items.join(", ")}</Text>
+                  </Bullet>
+                )
+            )}
           </View>
         )}
       </Page>

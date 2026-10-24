@@ -19,6 +19,16 @@ const resumeDocumentSchema = z.object({
       company: z.string(),
       period: z.string(),
       bullets: z.array(z.string()),
+      location: z.string().optional(),
+      projects: z
+        .array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            bullets: z.array(z.string()),
+          })
+        )
+        .optional(),
     })
   ),
   education: z.array(
@@ -27,6 +37,7 @@ const resumeDocumentSchema = z.object({
       degree: z.string(),
       school: z.string(),
       period: z.string(),
+      location: z.string().optional(),
     })
   ),
   skills: z.array(z.string()),
@@ -37,6 +48,24 @@ const resumeDocumentSchema = z.object({
       description: z.string(),
     })
   ),
+  additional: z
+    .array(
+      z.object({
+        label: z.string(),
+        items: z.array(z.string()),
+      })
+    )
+    .optional(),
+  customSections: z
+    .array(
+      z.object({
+        id: z.string(),
+        title: z.string(),
+        items: z.array(z.string()),
+      })
+    )
+    .optional(),
+  fontFamily: z.enum(["serif", "sans", "mono"]).optional(),
 });
 
 const letterDocumentSchema = z.object({
@@ -79,11 +108,15 @@ const resumeSystem = `You are the LogicCV resume assistant. The user writes conv
 
 The current document is included at the end in JSON. Return the FULL updated document every turn, keeping all previous information and ids, and only adding short new ids (like "e1", "sk2") when creating new entries.
 
-Resume JSON shape: { name, title, email, phone, location, summary, experience: [{ id, role, company, period, bullets: [string] }], education: [{ id, degree, school, period }], skills: [string], projects: [{ id, name, description }] }
+Resume JSON shape: { name, title, email, phone, location, summary, experience: [{ id, role, company, location?, period, bullets: [string], projects?: [{ id, name, bullets: [string] }] }], education: [{ id, degree, school, location?, period }], skills: [string], projects: [{ id, name, description }], additional?: [{ label, items: [string] }], customSections?: [{ id, title, items: [string] }], fontFamily?: "serif" | "sans" | "mono" }
 
 Rules:
 - Stay in "onboarding" until the user has provided name + title, contact, a summary, at least one experience role with achievement bullets, education, and skills. Then switch to "chat".
 - During onboarding, capture facts as given. In chat mode, improve wording only when the user asks (strong verbs, concise, ATS-friendly); never invent facts.
+- Capture each employer's and educational institution's location when supplied. Keep projects tied to an experience entry when the user identifies which role they belong to; do not infer that relationship.
+- Group additional skills and certifications under labeled "additional" entries when the user supplies categories. Keep existing skills and projects fields intact for compatibility.
+- Add, edit, reorder, or remove customSections when the user asks for a complete custom resume section. Each section has a stable id, a concise title, and an items array containing the user's lines or bullets; preserve all unrelated sections and facts.
+- Change fontFamily only when the user requests a font change. Use "serif" for Times New Roman, "sans" for Arial, or "mono" for Courier New, and preserve the current choice otherwise.
 - "pending" is null unless you asked the user to paste one of: a summary, experience, skills, or a project ("summary" | "experience" | "skills" | "project") and are waiting for that input.
 - "suggestions" must be exactly 4 short example follow-ups the user could type.
 - Never use em dashes (—) or en dashes (–). Use commas, periods, or plain hyphens instead.

@@ -4,16 +4,19 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 export const PAGE_WIDTH = 640;
 export const PAGE_RATIO = 210 / 297;
+export const US_LETTER_RATIO = 8.5 / 11;
 
 export function ZoomablePage({
   zoom,
+  pageRatio = PAGE_RATIO,
   children,
 }: {
   zoom: number;
+  pageRatio?: number;
   children: React.ReactNode;
 }) {
   const innerRef = useRef<HTMLDivElement>(null);
-  const [naturalHeight, setNaturalHeight] = useState(PAGE_WIDTH * PAGE_RATIO);
+  const [naturalHeight, setNaturalHeight] = useState(PAGE_WIDTH * pageRatio);
 
   useLayoutEffect(() => {
     const el = innerRef.current;

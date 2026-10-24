@@ -1,0 +1,64 @@
+{
+  "page": {
+    "size": "Letter",
+    "margins": {
+      "top": "0.6in",
+      "bottom": "0.6in",
+      "left": "0.7in",
+      "right": "0.7in"
+    }
+  },
+  "fontFamily": {
+    "default": "serif",
+    "options": {
+      "serif": "'Times New Roman', 'Liberation Serif', serif",
+      "sans": "Arial, Helvetica, sans-serif",
+      "mono": "'Courier New', Courier, monospace"
+    }
+  },
+  "fonts": {
+    "name": {
+      "size": "20pt",
+      "weight": "bold"
+    },
+    "title": {
+      "size": "11pt",
+      "weight": "normal"
+    },
+    "contact": {
+      "size": "10pt",
+      "weight": "normal"
+    },
+    "sectionHeading": {
+      "size": "11pt",
+      "weight": "bold",
+      "transform": "uppercase"
+    },
+    "body": {
+      "size": "10pt",
+      "weight": "normal"
+    }
+  },
+  "colors": {
+    "text": "#000000",
+    "rule": "#000000"
+  },
+  "ruleThickness": "0.75pt",
+  "lineHeight": "1.2",
+  "spacing": {
+    "sectionHeadingBefore": "10pt",
+    "sectionHeadingAfter": "4pt",
+    "betweenJobs": "6pt",
+    "betweenBullets": "2pt"
+  },
+  "bullets": {
+    "level1": {
+      "glyph": "●",
+      "indent": "14pt"
+    },
+    "level2": {
+      "glyph": "-",
+      "indent": "32pt"
+    }
+  }
+}

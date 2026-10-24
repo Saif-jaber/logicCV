@@ -14,7 +14,11 @@ import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ResumePreview } from "@/components/resume/resume-preview";
 import { Paginated } from "@/components/paginated";
-import { ZoomablePage, PAGE_WIDTH } from "@/components/zoomable-page";
+import {
+  ZoomablePage,
+  PAGE_WIDTH,
+  US_LETTER_RATIO,
+} from "@/components/zoomable-page";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,7 +27,12 @@ import {
   type AiStage,
   type PendingAction,
 } from "@/lib/resume-ai";
-import { computeAts, uid, type Resume } from "@/lib/resume";
+import {
+  computeAts,
+  getResumeFontFamily,
+  uid,
+  type Resume,
+} from "@/lib/resume";
 import { AiStepError } from "@/lib/ai";
 import { downloadPdf } from "@/lib/pdf";
 import { saveResumeAction } from "@/app/actions/documents";
@@ -154,7 +163,15 @@ export function ResumeBuilder({
           ...prev.messages,
           { id: uid(), role: "ai" as const, text: result.message },
         ],
-        resume: result.resume,
+        resume: {
+          ...result.resume,
+          additional:
+            result.resume.additional ?? prev.resume.additional ?? [],
+          customSections:
+            result.resume.customSections ?? prev.resume.customSections ?? [],
+          fontFamily:
+            result.resume.fontFamily ?? prev.resume.fontFamily ?? "serif",
+        },
         stage: result.stage,
         pending: result.pending,
         suggestions: result.suggestions,
@@ -246,7 +263,9 @@ export function ResumeBuilder({
               </span>
               <div className="min-w-0">
                 <p className="db-panel__title">LogicCV Assistant</p>
-                <p className="db-panel__meta">AI assistant · free-form chat</p>
+                <p className="db-panel__meta">
+                  Ask to add custom sections or change the font
+                </p>
               </div>
             </div>
           </div>
@@ -365,6 +384,31 @@ export function ResumeBuilder({
             <div className="flex items-center gap-2">
               <span className="db-score">{ats.score}</span>
               <span className="db-score--label">/100 ATS</span>
+              <label className="sr-only" htmlFor="resume-font-family">
+                Resume font
+              </label>
+              <select
+                id="resume-font-family"
+                value={getResumeFontFamily(state.resume)}
+                onChange={(event) => {
+                  const fontFamily = event.target.value;
+                  if (
+                    fontFamily === "serif" ||
+                    fontFamily === "sans" ||
+                    fontFamily === "mono"
+                  ) {
+                    setState((prev) => ({
+                      ...prev,
+                      resume: { ...prev.resume, fontFamily },
+                    }));
+                  }
+                }}
+                className="db-composer__field h-8 w-36 flex-none rounded-lg px-2 text-xs"
+              >
+                <option value="serif">Times New Roman</option>
+                <option value="sans">Arial</option>
+                <option value="mono">Courier New</option>
+              </select>
               <button
                 type="button"
                 onClick={handleExport}
@@ -403,8 +447,12 @@ export function ResumeBuilder({
           </div>
 
           <div ref={previewScrollRef} className="db-preview-scroll">
-            <ZoomablePage zoom={zoom}>
-              <Paginated>
+            <ZoomablePage zoom={zoom} pageRatio={US_LETTER_RATIO}>
+              <Paginated
+                pageRatio={US_LETTER_RATIO}
+                marginX={53}
+                marginY={45}
+              >
                 <ResumePreview resume={state.resume} />
               </Paginated>
             </ZoomablePage>

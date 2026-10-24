@@ -1,0 +1,68 @@
+{
+  "name": "Jordan Taylor",
+  "title": "Technical Program Manager",
+  "email": "jordan.taylor@example.com",
+  "phone": "(555) 010-1234",
+  "location": "Seattle, WA 98101",
+  "summary": "Technical program manager experienced in coordinating cross-functional teams and delivering platform improvements.",
+  "experience": [
+    {
+      "id": "exp-1",
+      "company": "NORTHSTAR SYSTEMS",
+      "location": "Seattle, WA",
+      "role": "Technical Program Manager",
+      "period": "2021-Present",
+      "bullets": [
+        "Coordinated a six-team platform migration, completing delivery two weeks ahead of schedule.",
+        "Introduced release readiness reviews that reduced production rollback frequency by 18%."
+      ],
+      "projects": [
+        {
+          "id": "exp-1-project-1",
+          "name": "Platform Migration",
+          "bullets": [
+            "Sequenced 14 service migrations with no customer-facing downtime."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "exp-2",
+      "company": "CASCADIA DIGITAL",
+      "location": "Portland, OR",
+      "role": "Program Manager",
+      "period": "2018-2021",
+      "bullets": [
+        "Established quarterly planning across engineering and operations teams."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "edu-1",
+      "school": "CASCADE STATE UNIVERSITY",
+      "location": "Portland, OR",
+      "degree": "Bachelor of Science, Information Systems",
+      "period": "2014-2018"
+    }
+  ],
+  "skills": ["Jira", "Agile delivery", "Risk management"],
+  "projects": [],
+  "fontFamily": "serif",
+  "customSections": [
+    {
+      "id": "section-1",
+      "title": "Leadership Highlights",
+      "items": [
+        "Mentored three project coordinators through their first program launches.",
+        "Facilitated monthly planning reviews with engineering and product leadership."
+      ]
+    }
+  ],
+  "additional": [
+    {
+      "label": "Certifications",
+      "items": ["Project Management Professional (PMP)"]
+    }
+  ]
+}

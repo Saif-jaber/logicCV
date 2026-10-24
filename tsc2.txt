@@ -1,0 +1,6 @@
+﻿app/api/generate/route.ts(173,17): error TS2304: Cannot find name 'ChatMessage'.
+app/api/generate/route.ts(200,16): error TS18046: 'object' is of type 'unknown'.
+app/api/generate/route.ts(201,14): error TS18046: 'object' is of type 'unknown'.
+app/api/generate/route.ts(202,17): error TS18046: 'object' is of type 'unknown'.
+app/api/generate/route.ts(203,16): error TS18046: 'object' is of type 'unknown'.
+app/api/generate/route.ts(204,32): error TS18046: 'object' is of type 'unknown'.

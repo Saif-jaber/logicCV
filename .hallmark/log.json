@@ -1,0 +1,17 @@
+{
+  "last_grapheme": "cobalt",
+  "entries": [
+    {
+      "id": "logiccv-landing-cobalt",
+      "date": "2026-09-19",
+      "project": "logiccv",
+      "page": "landing (/)",
+      "verb": "redesign",
+      "genre": "modern-minimal",
+      "macrostructure": "Split Studio",
+      "theme": "cobalt",
+      "grapheme": "cobalt (one accent oklch(58% 0.2 256); paper ~98.5% / hue 250; graphite band oklch(22% 0.016 260))",
+      "notes": "remapped shadcn --primary/--ring only inside .landing-shell so dashboard + auth dialog unaffected; landing tokens live in tokens.css; --font-display=Space Grotesk, --font-code=JetBrains Mono via @theme inline; used --color-cobalt rather than --color-accent to avoid shadcn collision"
+    }
+  ]
+}

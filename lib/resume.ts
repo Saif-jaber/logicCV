@@ -4,6 +4,14 @@ export interface ResumeExperience {
   company: string;
   period: string;
   bullets: string[];
+  location?: string;
+  projects?: ResumeExperienceProject[];
+}
+
+export interface ResumeExperienceProject {
+  id: string;
+  name: string;
+  bullets: string[];
 }
 
 export interface ResumeEducation {
@@ -11,6 +19,7 @@ export interface ResumeEducation {
   degree: string;
   school: string;
   period: string;
+  location?: string;
 }
 
 export interface ResumeProject {
@@ -18,6 +27,19 @@ export interface ResumeProject {
   name: string;
   description: string;
 }
+
+export interface ResumeAdditional {
+  label: string;
+  items: string[];
+}
+
+export interface ResumeCustomSection {
+  id: string;
+  title: string;
+  items: string[];
+}
+
+export type ResumeFontFamily = "serif" | "sans" | "mono";
 
 export interface Resume {
   name: string;
@@ -30,6 +52,22 @@ export interface Resume {
   education: ResumeEducation[];
   skills: string[];
   projects: ResumeProject[];
+  additional?: ResumeAdditional[];
+  customSections?: ResumeCustomSection[];
+  fontFamily?: ResumeFontFamily;
+}
+
+export function getResumeFontFamily(
+  resume: Pick<Resume, "fontFamily">
+): ResumeFontFamily {
+  if (
+    resume.fontFamily === "sans" ||
+    resume.fontFamily === "mono" ||
+    resume.fontFamily === "serif"
+  ) {
+    return resume.fontFamily;
+  }
+  return "serif";
 }
 
 export const emptyResume: Resume = {
@@ -43,6 +81,9 @@ export const emptyResume: Resume = {
   education: [],
   skills: [],
   projects: [],
+  additional: [],
+  customSections: [],
+  fontFamily: "serif",
 };
 
 export interface AtsCheck {
